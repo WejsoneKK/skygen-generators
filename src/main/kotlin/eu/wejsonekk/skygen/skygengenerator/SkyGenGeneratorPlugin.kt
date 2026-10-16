@@ -16,6 +16,8 @@ import eu.wejsonekk.skygen.skygengenerator.database.DatabaseManager
 import eu.wejsonekk.skygen.skygengenerator.database.StorageType
 import eu.wejsonekk.skygen.skygengenerator.database.mongo.MongoManager
 import eu.wejsonekk.skygen.skygengenerator.generator.adapter.GeneratorItemAdapter
+import eu.wejsonekk.skygen.skygengenerator.generator.argument.GeneratorId
+import eu.wejsonekk.skygen.skygengenerator.generator.argument.GeneratorIdArgument
 import eu.wejsonekk.skygen.skygengenerator.generator.command.GeneratorCommand
 import eu.wejsonekk.skygen.skygengenerator.generator.hologram.GeneratorHologramManager
 import eu.wejsonekk.skygen.skygengenerator.generator.manager.GeneratorManager
@@ -36,6 +38,7 @@ import eu.wejsonekk.skygen.skygengenerator.gui.GuiListener
 import eu.wejsonekk.skygen.skygengenerator.litecommand.InvalidUsageHandlerImpl
 import eu.wejsonekk.skygen.skygengenerator.litecommand.MissingPermissionHandlerImpl
 import eu.wejsonekk.skygen.skygengenerator.notice.NoticeService
+import eu.wejsonekk.skygen.skygengenerator.util.Text
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.ServicePriority
@@ -161,7 +164,8 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
         this.databaseConfig = this.configService.create(this.dataFolder.resolve("database.yml"))
 
         this.noticeService = NoticeService(this.messageConfig, this.miniMessage)
-        GuiItems.init(this.miniMessage, this.guiConfig)
+        GuiItems.init(this.guiConfig)
+        Text.init(this.miniMessage)
     }
 
     private fun setupStorage() {
@@ -188,8 +192,8 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
         val repository = this.createRepository()
         this.generatorService = GeneratorService(repository)
 
-        this.genBoostBossBarService = GenBoostBossBarService(this.miniMessage)
-        this.genBoostItemAdapter = GenBoostItemAdapter(this, this.genBoostConfig, this.miniMessage)
+        this.genBoostBossBarService = GenBoostBossBarService()
+        this.genBoostItemAdapter = GenBoostItemAdapter(this, this.genBoostConfig)
         this.genBoostManager = GenBoostManager(
             this,
             this.generatorService,
@@ -217,7 +221,6 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
             this,
             this.generatorService,
             this.generatorConfig,
-            this.miniMessage,
             this.logger,
         )
 
@@ -229,7 +232,7 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
 
     private fun registerListeners() {
         this.server.pluginManager.registerEvents(GuiListener(), this)
-        this.server.pluginManager.registerEvents(GenBoostItemListener(this.genBoostService), this)
+        this.server.pluginManager.registerEvents(GenBoostItemListener(this.genBoostService, this.genBoostConfig), this)
         this.server.pluginManager.registerEvents(GenBoostJoinListener(this.genBoostManager), this)
     }
 
@@ -251,6 +254,7 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
 
     private fun registerCommands() {
         this.litecommands = LiteBukkitFactory.builder("wSkyGen-Generators", this)
+            .argument(GeneratorId::class.java, GeneratorIdArgument(this.generatorService))
             .commands(
                 GeneratorCommand(
                     this,
@@ -260,7 +264,7 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
                     this.genBoostManager,
                     this.noticeService,
                     this.configService,
-                    this.miniMessage,
+                    this.generatorConfig,
                 ),
                 GenBoostCommand(
                     this.genBoostService,
