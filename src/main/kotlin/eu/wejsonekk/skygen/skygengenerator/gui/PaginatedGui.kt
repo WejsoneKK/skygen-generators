@@ -1,21 +1,20 @@
 package eu.wejsonekk.skygen.skygengenerator.gui
 
+import eu.wejsonekk.skygen.skygengenerator.config.impl.GuiSectionConfig
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 
 /**
- * A 1..6 row GUI able to paginate [content]. Only the inner slots (everything
- * except the outer border and the bottom row) are used for content, so a
- * bordered background (see [GuiLayout.bordered]) stays visible.
+ * A paginated GUI. The look & feel (title, rows, items, slots) comes from the
+ * [GuiSectionConfig]. Only the inner slots (everything except the outer border)
+ * are used for [content], so a bordered background stays visible.
  *
- * The bottom row is reserved for the navigation heads, page info and the
- * additional [controls].
+ * The navigation items (`previousPage`, `nextPage`, `pageInfo`) and the
+ * additional [controls] can be freely placed through the section slots.
  */
 abstract class PaginatedGui(
-    rows: Int,
+    section: GuiSectionConfig,
     title: Component,
-    protected val miniMessage: MiniMessage,
-) : AbstractGui(rows, title) {
+) : AbstractGui(section, title) {
 
     protected var page: Int = 0
 
@@ -25,8 +24,9 @@ abstract class PaginatedGui(
 
     /** Slots available for the [content] (inner area, without the border). */
     protected open fun contentSlots(): List<Int> {
+        val rows = this.section.rows.coerceIn(1, 6)
         val slots = ArrayList<Int>()
-        for (row in 1 until this.rows - 1) {
+        for (row in 1 until rows - 1) {
             for (column in 1 until 8) {
                 slots.add(row * 9 + column)
             }
@@ -48,14 +48,22 @@ abstract class PaginatedGui(
         }
 
         val base = this.size - 9
+        val placeholders = mapOf("page" to (this.page + 1).toString(), "pages" to pages.toString())
+
         if (this.page > 0) {
-            this.setItem(base, GuiItems.previousPage()) { player -> this.page -= 1; this.open(player) }
+            this.setItem(this.slot("previousPage", base), this.guiItem("previousPage", placeholders)) { player ->
+                this.page -= 1
+                this.open(player)
+            }
         }
         if (this.page < pages - 1) {
-            this.setItem(base + 8, GuiItems.nextPage()) { player -> this.page += 1; this.open(player) }
+            this.setItem(this.slot("nextPage", base + 8), this.guiItem("nextPage", placeholders)) { player ->
+                this.page += 1
+                this.open(player)
+            }
         }
 
-        this.setItem(base + 4, GuiItems.pageInfo(this.page + 1, pages))
+        this.setItem(this.slot("pageInfo", base + 4), this.guiItem("pageInfo", placeholders))
 
         this.controls().forEach { (slot, entry) -> this.setItem(slot, entry.item, entry.action) }
     }

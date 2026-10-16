@@ -2,43 +2,77 @@ package eu.wejsonekk.skygen.skygengenerator.generator.gui
 
 import com.cryptomorin.xseries.XMaterial
 import eu.wejsonekk.skygen.skygengenerator.api.generator.Generator
+import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
 import eu.wejsonekk.skygen.skygengenerator.generator.model.GeneratorImpl
 import eu.wejsonekk.skygen.skygengenerator.generator.service.GeneratorService
 import eu.wejsonekk.skygen.skygengenerator.gui.AbstractGui
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiItems
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiLayout
-import eu.wejsonekk.skygen.skygengenerator.gui.ItemBuilder
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
-import net.kyori.adventure.text.minimessage.MiniMessage
+import eu.wejsonekk.skygen.skygengenerator.util.Text
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import java.time.Duration
 
 /**
  * Editor for a single generator. Every button immediately persists the change
- * and re-renders the GUI.
+ * and re-renders the GUI. Fully configurable through `gui.yml` (`guis.editor`).
  */
 class GeneratorEditGui(
     private val service: GeneratorService,
-    private val miniMessage: MiniMessage,
     private var generator: Generator,
-) : AbstractGui(3, miniMessage.deserialize("<dark_gray>Generator <white>${generator.id}")) {
+    private val generatorConfig: GeneratorConfig,
+) : AbstractGui(
+    GuiItems.editor(),
+    Text.parse(GuiItems.editor().title.replace("{id}", generator.id)),
+) {
 
-    override fun layout(): GuiLayout = GuiLayout.bordered(3, GuiItems.filler(), GuiItems.accent())
+    override fun layout(): GuiLayout = GuiLayout.bordered(this.rows, this.guiItem("filler"), this.guiItem("accent"))
 
     override fun build() {
-        this.setItem(10, this.infoItem())
-        this.setItem(11, this.toggleItem()) { player -> this.apply(this.copy(enabled = !this.generator.enabled), player) }
-        this.setItem(12, this.amountItem(1)) { player -> this.apply(this.copy(amount = this.generator.amount + 1), player) }
-        this.setItem(13, this.amountItem(-1)) { player -> this.apply(this.copy(amount = (this.generator.amount - 1).coerceAtLeast(1)), player) }
-        this.setItem(14, this.intervalItem(30)) { player -> this.apply(this.copy(interval = this.generator.interval.plusSeconds(30)), player) }
-        this.setItem(15, this.intervalItem(-30)) { player -> this.apply(this.copy(interval = this.shorten()), player) }
-        this.setItem(16, this.materialItem()) { player -> this.apply(this.copy(material = XMaterial.matchXMaterial(player.inventory.itemInMainHand.type)), player) }
+        val ph = this.placeholders()
 
-        this.backButton(18)
-        this.setItem(22, this.deleteItem()) { player -> this.delete(player) }
-        this.setItem(26, GuiItems.close()) { player -> player.closeInventory() }
+        this.setItem(this.slot("info", 10), this.guiItem("info", ph))
+        this.setItem(this.slot("toggle", 11), this.guiItem("toggle", ph)) { player ->
+            this.apply(this.copy(enabled = !this.generator.enabled), player)
+        }
+        this.setItem(this.slot("amountIncrease", 12), this.guiItem("amountIncrease", ph)) { player ->
+            this.apply(this.copy(amount = this.generator.amount + 1), player)
+        }
+        this.setItem(this.slot("amountDecrease", 13), this.guiItem("amountDecrease", ph)) { player ->
+            this.apply(this.copy(amount = (this.generator.amount - 1).coerceAtLeast(1)), player)
+        }
+        this.setItem(this.slot("intervalIncrease", 14), this.guiItem("intervalIncrease", ph)) { player ->
+            this.apply(this.copy(interval = this.generator.interval.plusSeconds(30)), player)
+        }
+        this.setItem(this.slot("intervalDecrease", 15), this.guiItem("intervalDecrease", ph)) { player ->
+            this.apply(this.copy(interval = this.shorten()), player)
+        }
+        this.setItem(this.slot("changeMaterial", 16), this.guiItem("changeMaterial", ph)) { player ->
+            this.apply(this.copy(material = XMaterial.matchXMaterial(player.inventory.itemInMainHand.type)), player)
+        }
+        this.setItem(this.slot("radiusIncrease", 20), this.guiItem("radiusIncrease", ph)) { player ->
+            this.apply(this.copy(activationRadius = this.currentRadius() + 1.0), player)
+        }
+        this.setItem(this.slot("radiusDecrease", 19), this.guiItem("radiusDecrease", ph)) { player ->
+            this.apply(this.copy(activationRadius = (this.currentRadius() - 1.0).coerceAtLeast(1.0)), player)
+        }
+
+        this.backButton(27)
+        this.setItem(this.slot("delete", 31), this.guiItem("delete", ph)) { player -> this.delete(player) }
+        this.setItem(this.slot("close", 35), this.guiItem("close", ph)) { player -> player.closeInventory() }
     }
+
+    private fun placeholders(): Map<String, String> = mapOf(
+        "id" to this.generator.id,
+        "material" to this.generator.material.name,
+        "amount" to this.generator.amount.toString(),
+        "interval" to DurationFormat.format(this.generator.interval),
+        "radius" to this.currentRadius().toString(),
+        "owner" to (this.generator.ownerId?.toString() ?: "brak"),
+        "enabled" to if (this.generator.enabled) "<green>włączony" else "<red>wyłączony",
+    )
+
+    private fun currentRadius(): Double = this.generator.activationRadius ?: this.generatorConfig.activationRadius
 
     private fun apply(updated: Generator, player: Player) {
         this.service.update(updated)
@@ -55,12 +89,14 @@ class GeneratorEditGui(
         material: XMaterial = this.generator.material,
         amount: Int = this.generator.amount,
         interval: Duration = this.generator.interval,
+        activationRadius: Double? = this.generator.activationRadius,
         enabled: Boolean = this.generator.enabled,
     ): Generator = GeneratorImpl(
         id = this.generator.id,
         material = material,
         amount = amount.coerceAtLeast(1),
         interval = interval,
+        activationRadius = activationRadius,
         ownerId = this.generator.ownerId,
         location = this.generator.location,
         enabled = enabled,
@@ -72,42 +108,4 @@ class GeneratorEditGui(
         val shortened = this.generator.interval.minusSeconds(30)
         return if (shortened.isNegative || shortened.isZero) Duration.ofSeconds(1) else shortened
     }
-
-    private fun infoItem(): ItemStack {
-        val owner = this.generator.ownerId?.toString() ?: "brak"
-        return ItemBuilder.of(this.miniMessage, XMaterial.PAPER)
-            .name("<gold>Informacje")
-            .lore(
-                "<gray>ID: <white>${this.generator.id}",
-                "<gray>Item: <white>${this.generator.material} <gray>x<white>${this.generator.amount}",
-                "<gray>Interwal: <white>${DurationFormat.format(this.generator.interval)}",
-                "<gray>Wlasciciel: <white>$owner",
-            )
-            .build()
-    }
-
-    private fun toggleItem(): ItemStack = this.named(
-        XMaterial.LEVER,
-        "<gold>Stan: ${if (this.generator.enabled) "<green>wlaczony" else "<red>wylaczony"}",
-    )
-
-    private fun amountItem(delta: Int): ItemStack = this.named(
-        if (delta > 0) XMaterial.LIME_DYE else XMaterial.RED_DYE,
-        if (delta > 0) "<green>Ilosc +1" else "<red>Ilosc -1",
-    )
-
-    private fun intervalItem(delta: Int): ItemStack = this.named(
-        if (delta > 0) XMaterial.LIME_DYE else XMaterial.RED_DYE,
-        if (delta > 0) "<green>Interwal +30s" else "<red>Interwal -30s",
-    )
-
-    private fun materialItem(): ItemStack = ItemBuilder.of(this.miniMessage, XMaterial.PAPER)
-        .name("<gold>Zmien material")
-        .lore("<gray>Na item trzymany w dloni")
-        .build()
-
-    private fun deleteItem(): ItemStack = this.named(XMaterial.BARRIER, "<red>Usun generator")
-
-    private fun named(material: XMaterial, name: String): ItemStack =
-        ItemBuilder.of(this.miniMessage, material).name(name).build()
 }

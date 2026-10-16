@@ -2,66 +2,55 @@ package eu.wejsonekk.skygen.skygengenerator.gui
 
 import com.cryptomorin.xseries.XMaterial
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GuiConfig
-import net.kyori.adventure.text.minimessage.MiniMessage
+import eu.wejsonekk.skygen.skygengenerator.config.impl.GuiItemConfig
+import eu.wejsonekk.skygen.skygengenerator.config.impl.GuiSectionConfig
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /**
- * Shared, ready to use GUI items (navigation heads, page info, filler/accent).
- * Initialised once from the plugin with the [GuiConfig].
+ * Turns a [GuiItemConfig] into a ready to use [ItemStack], applying the GUI
+ * specific `{...}` placeholders (PAPI placeholders are resolved by [ItemBuilder]).
  */
 object GuiItems {
 
-    private lateinit var miniMessage: MiniMessage
     private lateinit var config: GuiConfig
 
-    fun init(miniMessage: MiniMessage, config: GuiConfig) {
-        this.miniMessage = miniMessage
+    fun init(config: GuiConfig) {
         this.config = config
     }
 
-    // --- navigation ---
+    fun list(): GuiSectionConfig = this.config.list
 
-    fun previousPage(): ItemStack =
-        head(this.config.previousPageHead, "<dark_gray>« <red>Poprzednia strona")
+    fun editor(): GuiSectionConfig = this.config.editor
 
-    fun nextPage(): ItemStack =
-        head(this.config.nextPageHead, "<dark_gray>» <red>Następna strona")
+    fun build(item: GuiItemConfig?, viewer: Player?, placeholders: Map<String, String> = emptyMap()): ItemStack {
+        val definition = item ?: GuiItemConfig()
+        val material = XMaterial.matchXMaterial(definition.material).orElse(XMaterial.STONE)
 
-    fun back(): ItemStack =
-        head(this.config.backHead, "<dark_gray>« <red>Powrót")
+        val builder = ItemBuilder.of(material, definition.amount, viewer)
+            .texture(definition.texture)
+            .glow(definition.glow)
+            .customModelData(definition.customModelData)
 
-    fun pageInfo(page: Int, pages: Int): ItemStack =
-        ItemBuilder.of(this.miniMessage, XMaterial.PAPER)
-            .name("<yellow>Strona <white>$page<yellow>/<white>$pages")
-            .build()
+        val name = apply(definition.name, placeholders)
+        if (name.isNotBlank()) {
+            builder.name(name)
+        }
 
-    fun close(): ItemStack =
-        ItemBuilder.of(this.miniMessage, XMaterial.BARRIER)
-            .name("<red>Zamknij")
-            .build()
+        val lore = definition.lore.map { apply(it, placeholders) }
+        if (lore.isNotEmpty()) {
+            builder.lore(lore)
+        }
 
-    // --- layout / filler ---
+        return builder.build()
+    }
 
-    fun filler(): ItemStack = ItemBuilder.of(this.miniMessage, this.fillerMaterial())
-        .name(this.config.fillerName)
-        .build()
-
-    fun accent(): ItemStack = ItemBuilder.of(this.miniMessage, this.accentMaterial())
-        .name(this.config.accentName)
-        .build()
-
-    fun material(raw: String, fallback: XMaterial): XMaterial =
-        XMaterial.matchXMaterial(raw).orElse(fallback)
-
-    private fun fillerMaterial(): XMaterial =
-        this.material(this.config.fillerMaterial, XMaterial.GRAY_STAINED_GLASS_PANE)
-
-    private fun accentMaterial(): XMaterial =
-        this.material(this.config.accentMaterial, XMaterial.LIME_STAINED_GLASS_PANE)
-
-    private fun head(texture: String, name: String): ItemStack =
-        ItemBuilder.of(this.miniMessage, XMaterial.PLAYER_HEAD)
-            .texture(texture)
-            .name(name)
-            .build()
+    fun apply(text: String, placeholders: Map<String, String>): String {
+        if (placeholders.isEmpty()) {
+            return text
+        }
+        var result = text
+        placeholders.forEach { (key, value) -> result = result.replace("{$key}", value) }
+        return result
+    }
 }
