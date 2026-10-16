@@ -4,11 +4,12 @@ import com.cryptomorin.xseries.XMaterial
 import eu.wejsonekk.skygen.skygengenerator.api.genboost.GenBoostType
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GenBoostConfig
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
+import eu.wejsonekk.skygen.skygengenerator.util.Text
 import eu.wejsonekk.skygen.skygengenerator.util.XItemStackCodec
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
@@ -24,7 +25,6 @@ import java.time.Duration
 class GenBoostItemAdapter(
     plugin: Plugin,
     private val config: GenBoostConfig,
-    private val miniMessage: MiniMessage,
 ) {
 
     private val keyType = NamespacedKey(plugin, "genboost_type")
@@ -64,7 +64,7 @@ class GenBoostItemAdapter(
         }
     }
 
-    fun create(type: GenBoostType, multiplier: Double, duration: Duration, name: String): ItemStack {
+    fun create(type: GenBoostType, multiplier: Double, duration: Duration, name: String, viewer: Player? = null): ItemStack {
         val item = this.template(type).clone()
         val meta = item.itemMeta ?: return item
 
@@ -77,9 +77,9 @@ class GenBoostItemAdapter(
         if (lore.isNotEmpty()) {
             lore.add(Component.empty())
         }
-        lore.add(this.miniMessage.deserialize("<gray>Mnoznik: <white>x$multiplier"))
-        lore.add(this.miniMessage.deserialize("<gray>Czas: <white>${DurationFormat.format(duration)}"))
-        lore.add(this.miniMessage.deserialize("<yellow>Kliknij prawym, aby aktywowac"))
+        lore.add(Text.parseItem("<gray>Mnożnik: <white>x$multiplier", viewer))
+        lore.add(Text.parseItem("<gray>Czas: <white>${DurationFormat.format(duration)}", viewer))
+        lore.add(Text.parseItem("<yellow>Kliknij prawym, aby aktywować", viewer))
         meta.lore(lore)
 
         item.itemMeta = meta
@@ -103,7 +103,27 @@ class GenBoostItemAdapter(
     }
 
     private fun defaultTemplate(type: GenBoostType): ItemStack {
-        val material = if (type == GenBoostType.GLOBAL) XMaterial.BEACON else XMaterial.NETHER_STAR
-        return material.parseItem() ?: ItemStack(Material.STONE)
+        val global = type == GenBoostType.GLOBAL
+        val material = if (global) XMaterial.BEACON else XMaterial.NETHER_STAR
+        val item = material.parseItem() ?: ItemStack(Material.STONE)
+        val meta = item.itemMeta ?: return item
+
+        val name = if (global) {
+            "<gradient:#00c6ff:#0072ff><bold>GLOBALNY GENBOOST</bold></gradient>"
+        } else {
+            "<gradient:#f7971e:#ffd200><bold>PERSONALNY GENBOOST</bold></gradient>"
+        }
+        meta.displayName(Text.parseItem(name))
+
+        val accent = if (global) "<#00c6ff>" else "<#ffd200>"
+        meta.lore(
+            listOf(
+                Text.parseItem("<gray>Zwiększa ilość generowanych przedmiotów."),
+                Text.parseItem("<gray>Typ: ${accent}${if (global) "globalny" else "personalny"}"),
+            ),
+        )
+
+        item.itemMeta = meta
+        return item
     }
 }

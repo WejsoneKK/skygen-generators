@@ -177,7 +177,7 @@ class GenBoostManager(
 
         if (this.config.lottery.enabled && this.config.lottery.countdownBossBar) {
             val remaining = Duration.between(now, this.nextLotteryAt)
-            if (!remaining.isNegative && !remaining.isZero) {
+            if (this.countdownVisible(remaining)) {
                 this.bossBarService.showCountdown(remaining, this.safeInterval(), listOf(player))
             }
         }
@@ -209,8 +209,10 @@ class GenBoostManager(
             return
         }
 
-        if (this.config.lottery.countdownBossBar) {
+        if (this.config.lottery.countdownBossBar && this.countdownVisible(remaining)) {
             this.bossBarService.updateCountdown(remaining, this.safeInterval(), this.chatAudience())
+        } else {
+            this.bossBarService.hideCountdown()
         }
     }
 
@@ -251,16 +253,27 @@ class GenBoostManager(
             GenBoostType.PERSONAL -> active.ownerId?.let { Bukkit.getPlayer(it) }?.let { listOf(it) } ?: emptyList()
         }
 
+        val next = if (this.config.lottery.enabled) {
+            DurationFormat.format(Duration.between(Instant.now(), this.nextLotteryAt).coerceAtLeast(Duration.ZERO))
+        } else {
+            "-"
+        }
+
         viewers.forEach { viewer ->
             this.noticeService.create()
                 .viewer(viewer)
                 .notice { it.genBoostExpired }
                 .placeholder("{name}", active.name)
+                .placeholder("{next}", next)
                 .send()
         }
     }
 
     // --- helpers ---
+
+    /** Whether the next-lottery countdown should currently be visible. */
+    private fun countdownVisible(remaining: Duration): Boolean =
+        !remaining.isNegative && !remaining.isZero && remaining <= this.config.lottery.countdownThreshold
 
     private fun pickWeighted(): GenBoostPresetConfig? {
         val presets = this.config.lottery.presets.values.filter { it.weight > 0 }

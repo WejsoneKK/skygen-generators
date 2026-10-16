@@ -91,7 +91,7 @@ class MessageConfig : OkaeriConfig() {
     )
 
     var genBoostExpired: Notice? = Notice.chat(
-        "<red>GenBoost <white>{name}<red> wygasł."
+        "<red>GenBoost <white>{name}<red> wygasł. <gray>Następne losowanie za <white>{next}<gray>."
     )
 
     var genBoostLotteryDraw: Notice? = Notice.chat(

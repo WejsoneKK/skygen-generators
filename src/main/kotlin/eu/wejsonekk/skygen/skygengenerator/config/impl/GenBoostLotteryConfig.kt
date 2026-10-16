@@ -21,6 +21,9 @@ class GenBoostLotteryConfig : OkaeriConfig() {
     @Comment("Czy licznik do nastepnego losowania ma byc pokazywany na bossbarze")
     var countdownBossBar: Boolean = true
 
+    @Comment("Od kiedy (przed losowaniem) ma pojawiac sie bossbar z odliczaniem")
+    var countdownThreshold: Duration = Duration.ofMinutes(5)
+
     @Comment("Pula presetow do losowania (losowanie wg wagi)")
     var presets: MutableMap<String, GenBoostPresetConfig> = linkedMapOf(
         "small" to GenBoostPresetConfig().apply {

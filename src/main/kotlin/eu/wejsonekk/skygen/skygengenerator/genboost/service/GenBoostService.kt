@@ -29,7 +29,7 @@ class GenBoostService(
         duration: Duration,
         name: String,
     ): Boolean {
-        val item = this.itemAdapter.create(type, multiplier, duration, name)
+        val item = this.itemAdapter.create(type, multiplier, duration, name, player)
 
         val boost = GenBoostImpl(
             type = type,

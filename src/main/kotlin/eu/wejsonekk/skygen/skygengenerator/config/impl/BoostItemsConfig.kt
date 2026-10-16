@@ -15,4 +15,7 @@ class BoostItemsConfig : OkaeriConfig() {
 
     @Comment("Zserializowany (XItemStack) item reprezentujacy fizyczny globalny GenBoost")
     var global: String = ""
+
+    @Comment("Czy fizyczne GenBoosty mozna aktywowac takze klikajac w powietrzu")
+    var allowAirActivation: Boolean = true
 }
