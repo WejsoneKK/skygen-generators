@@ -4,6 +4,23 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.1] - 2026-10-17
+
+### Added
+- **Sugestie ID generatorów** – dedykowany argument LiteCommands (`GeneratorId`) z podpowiedziami istniejących ID w `/generator remove|edit|tp`.
+- **Zasięg aktywacji per generator** – każdy generator może mieć własny dystans wymaganego gracza (edycja w GUI), z fallbackiem do globalnego ustawienia.
+- **Pełna personalizacja GUI** – `gui.yml` ma teraz sekcje `guis.list` i `guis.editor`; każdy item/przycisk (material, nazwa, lore, tekstura, glow, ilość, custom model data) oraz jego slot są konfigurowalne.
+- **Domyślne itemy GenBoostów** – przykładowe itemy z gradientem (globalny/personalny) używane gdy brak własnego szablonu.
+- **Wsparcie placeholderów PlaceholderAPI** – wszędzie (GUI, itemy, hologramy, bossbary, wiadomości) placeholdery `%...%` są rozwiązywane przed parsowaniem MiniMessage.
+- **Licznik następnego losowania** – bossbar z odliczaniem pojawia się tylko w ostatnim oknie (`countdownThreshold`, domyślnie 5 min) przed losowaniem, a po wygaśnięciu boosta pokazywany jest czas do następnego.
+
+### Changed
+- `ItemBuilder`/GUI korzystają z centralnego parsera `Text` (MiniMessage + PlaceholderAPI) i wspierają kontekst gracza.
+- Bossbar losowania nie jest już wyświetlany bez przerwy przez cały czas trwania boosta.
+
+### Fixed
+- (brak)
+
 ## [0.2.0-alpha.1] - 2026-10-17
 
 ### Added
