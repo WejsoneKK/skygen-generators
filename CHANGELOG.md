@@ -4,6 +4,11 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.4] - 2026-10-17
+
+### Changed
+- Wyrównano kolumny tabel w `README` (komendy i uprawnienia) zgodnie z formatowaniem Markdown.
+
 ## [0.3.0-alpha.3] - 2026-10-17
 
 ### Changed

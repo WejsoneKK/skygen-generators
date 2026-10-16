@@ -30,38 +30,38 @@ system and a fully configurable GUI.
 
 Base command: `/generator` (aliases: `/skygen`, `/sg`)
 
-| Command | Description | Permission |
-| --- | --- | --- |
-| `/generator` | Shows the command list | - |
-| `/generator create <id> <material> <amount> <time>` | Creates a generator at your location | `skygen.command.create` |
-| `/generator remove <id>` | Deletes a generator | `skygen.command.remove` |
-| `/generator edit <id>` | Opens the generator editor GUI | `skygen.command.edit` |
-| `/generator tp <id>` | Teleports you to a generator | `skygen.command.tp` |
-| `/generator list` | Opens a paginated list of generators | `skygen.command.list` |
-| `/generator reload` | Reloads the plugin configuration | `skygen.command.reload` |
+| Command                                             | Description                            | Permission              |
+| --------------------------------------------------- | -------------------------------------- | ----------------------- |
+| `/generator`                                        | Shows the command list                 | -                       |
+| `/generator create <id> <material> <amount> <time>` | Creates a generator at your location   | `skygen.command.create` |
+| `/generator remove <id>`                            | Deletes a generator                    | `skygen.command.remove` |
+| `/generator edit <id>`                              | Opens the generator editor GUI         | `skygen.command.edit`   |
+| `/generator tp <id>`                                | Teleports you to a generator           | `skygen.command.tp`     |
+| `/generator list`                                   | Opens a paginated list of generators   | `skygen.command.list`   |
+| `/generator reload`                                 | Reloads the plugin configuration       | `skygen.command.reload` |
 
 Base command: `/genboost` (aliases: `/gb`, `/genboosts`)
 
-| Command | Description | Permission |
-| --- | --- | --- |
-| `/genboost` | Shows the command list | - |
-| `/genboost give <player> <multiplier> <time>` | Gives a personal boost item to a player | `skygen.command.genboost.give` |
-| `/genboost give-all <multiplier> <time>` | Activates a global boost for everyone | `skygen.command.genboost.giveall` |
-| `/genboost set-item <personal\|global>` | Sets the physical boost item from your hand | `skygen.command.genboost.setitem` |
+| Command                                       | Description                                 | Permission                         |
+| --------------------------------------------- | ------------------------------------------- | ---------------------------------- |
+| `/genboost`                                   | Shows the command list                      | -                                  |
+| `/genboost give <player> <multiplier> <time>` | Gives a personal boost item to a player     | `skygen.command.genboost.give`     |
+| `/genboost give-all <multiplier> <time>`      | Activates a global boost for everyone       | `skygen.command.genboost.giveall`  |
+| `/genboost set-item <personal\|global>`       | Sets the physical boost item from your hand | `skygen.command.genboost.setitem`  |
 
 ## Permissions
 
-| Permission | Description |
-| --- | --- |
-| `skygen.command.create` | Allows creating generators |
-| `skygen.command.remove` | Allows removing generators |
-| `skygen.command.edit` | Allows opening the generator editor |
-| `skygen.command.tp` | Allows teleporting to a generator |
-| `skygen.command.list` | Allows listing generators |
-| `skygen.command.reload` | Allows reloading the plugin |
-| `skygen.command.genboost.give` | Allows giving personal boosts |
-| `skygen.command.genboost.giveall` | Allows giving global boosts |
-| `skygen.command.genboost.setitem` | Allows changing the boost item template |
+| Permission                         | Description                                 |
+| ---------------------------------- | ------------------------------------------- |
+| `skygen.command.create`            | Allows creating generators                  |
+| `skygen.command.remove`            | Allows removing generators                  |
+| `skygen.command.edit`              | Allows opening the generator editor         |
+| `skygen.command.tp`                | Allows teleporting to a generator           |
+| `skygen.command.list`              | Allows listing generators                   |
+| `skygen.command.reload`            | Allows reloading the plugin                 |
+| `skygen.command.genboost.give`     | Allows giving personal boosts               |
+| `skygen.command.genboost.giveall`  | Allows giving global boosts                 |
+| `skygen.command.genboost.setitem`  | Allows changing the boost item template     |
 
 ## Building
 The project uses the Gradle Shadow plugin and targets Java 23.
