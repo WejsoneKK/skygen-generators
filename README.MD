@@ -1,64 +1,91 @@
-# SkyGen SkyGenerators
+# wSkyGenGenerators
 
-#### LITTLE DESCRIPTION
-SkyGen SkyGenerators is a plugin that allows you to create sky generators.
+Lightweight SkyGen generator plugin for Paper. It lets you create sky generators
+that periodically drop configurable items, with optional holograms, a GenBoost
+system and a fully configurable GUI.
 
-Generators periodically drop configurable items on the ground, can be toggled
-on/off, require a nearby player within a configurable radius, and support
-holograms (native TextDisplay or FancyHolograms). A full GenBoost system
-(global and personal boosts, lottery, physical click-to-activate items and
-bossbars) is included, together with a fully configurable inventory GUI and a
-public API + event system for other plugins.
+> **DISCLAIMER** - This plugin is not finished yet.
 
-### FEATURES
-- Sky generators with per-generator material, amount, interval and activation radius
-- Optional requirement of a nearby player to run a generator
-- Holograms: native TextDisplay by default, FancyHolograms when available
+## Features
+- Sky generators with configurable material, amount, interval and activation radius
+- Optional requirement of a nearby player for a generator to run
+- Holograms: native TextDisplay by default, FancyHolograms when installed
 - GenBoost system: global and personal boosts, lottery, bossbars, physical items
 - Fully customizable GUI (`gui.yml`) - every item, slot and text is configurable
 - PlaceholderAPI support everywhere (GUI, items, holograms, bossbars, messages)
-- Storage backends: flat files, SQL (MariaDB) and MongoDB
-- Public API and custom events
+- Storage backends: flat files, SQL (MariaDB/PostgreSQL) and MongoDB
+- Public API and custom events for other plugins
 
-### DEPENDENCIES
-- PlaceholderAPI (optional)
-- Brain (required)
-- Vault (optional)
-- WorldGuard (optional)
-- FancyHolograms (optional)
+## Requirements
+- Paper 1.21.8 (base version, tested)
+- Java 23+
 
-### SUPPORT VERSION
-- 1.21.8 (base version) (tested)
-- 1.21.11 (not tested)
-- 26.1 (not tested)
-- 26.2 (not tested)
-- 26.3 (not tested)
+### Optional dependencies
+- [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI)
+- [FancyHolograms](https://github.com/FancyInnovations/FancyHolograms)
+- Vault
+- WorldGuard
 
+## Commands
 
-!!DISCLAIMER - THIS PLUGIN IS NOT FINISHED YET!!
+Base command: `/generator` (aliases: `/skygen`, `/sg`)
 
-### COMMANDS
-/wskygen help - Shows all commands
-/wskygen create [name] [material] [amount] [time] - Creates a sky generator
-/wskygen delete [id] - Deletes a sky generator
-/wskygen list - Lists all sky generators
-/wskygen info [id] - Shows sky generator info
-/wskygen edit [id] - Opens the generator editor GUI
-/wskygen tp [id] - Teleports to a sky generator
-/wskygen reload - Reloads the plugin
-/wskygen genboost - Boosts sky generator generation
-/wskygen genboost [type PERSONAL/GLOBAL] [tier] [time] - Boosts sky generator generation
+| Command | Description | Permission |
+| --- | --- | --- |
+| `/generator` | Shows the command list | - |
+| `/generator create <id> <material> <amount> <time>` | Creates a generator at your location | `skygen.command.create` |
+| `/generator remove <id>` | Deletes a generator | `skygen.command.remove` |
+| `/generator edit <id>` | Opens the generator editor GUI | `skygen.command.edit` |
+| `/generator tp <id>` | Teleports you to a generator | `skygen.command.tp` |
+| `/generator list` | Opens a paginated list of generators | `skygen.command.list` |
+| `/generator reload` | Reloads the plugin configuration | `skygen.command.reload` |
 
-### CONTRIBUTING
+Base command: `/genboost` (aliases: `/gb`, `/genboosts`)
+
+| Command | Description | Permission |
+| --- | --- | --- |
+| `/genboost` | Shows the command list | - |
+| `/genboost give <player> <multiplier> <time>` | Gives a personal boost item to a player | `skygen.command.genboost.give` |
+| `/genboost give-all <multiplier> <time>` | Activates a global boost for everyone | `skygen.command.genboost.giveall` |
+| `/genboost set-item <personal\|global>` | Sets the physical boost item from your hand | `skygen.command.genboost.setitem` |
+
+## Permissions
+
+| Permission | Description |
+| --- | --- |
+| `skygen.command.create` | Allows creating generators |
+| `skygen.command.remove` | Allows removing generators |
+| `skygen.command.edit` | Allows opening the generator editor |
+| `skygen.command.tp` | Allows teleporting to a generator |
+| `skygen.command.list` | Allows listing generators |
+| `skygen.command.reload` | Allows reloading the plugin |
+| `skygen.command.genboost.give` | Allows giving personal boosts |
+| `skygen.command.genboost.giveall` | Allows giving global boosts |
+| `skygen.command.genboost.setitem` | Allows changing the boost item template |
+
+## Building
+The project uses the Gradle Shadow plugin and targets Java 23.
+
+```
+gradle build
+```
+
+The ready-to-use plugin jar is generated at:
+
+```
+build/libs/wSkyGenGenerators-<version>-all.jar
+```
+
+## Contributing
 - Fork the repository
 - Create a new branch
 - Make your changes
-- Create a pull request
-- Wait for the pull request to be accepted
+- Open a pull request
+- Wait for the pull request to be reviewed and merged
 - Enjoy!
 
-### AI USAGE
-This project is developed with the assistance of AI. Parts of the code, the
+## AI usage
+This project is developed with the help of AI. Parts of the code, the
 documentation and the changelog are written or refined by an AI coding agent.
 
 - **Agent:** [OpenCode](https://opencode.ai)
@@ -66,15 +93,16 @@ documentation and the changelog are written or refined by an AI coding agent.
 
 All AI-generated changes are reviewed before being merged.
 
-### LICENSE
-- Let's go to [LICENSE](LICENSE.MD)
-
-
-### LIBRARIES USED
-- [LiteCommands](https://github.com/Rollczi/LiteCommands) - Amazing framework for commands
-- [Okaeri-Configs](https://github.com/OkaeriPoland/okaeri-configs) - Library for configuration
-- [xSeries](https://github.com/CryptoMorin/XSeries) - Amazing library for support multiple versions
-- [TriumphGui](https://github.com/TriumphTeam/triumph-gui) - Library for Gui
-- [EternalCodeCommons](https://github.com/EternalCodeTeam/EternalCodeCommons) - Amazing Library
+## Libraries used
+- [LiteCommands](https://github.com/Rollczi/LiteCommands) - Command framework
+- [Okaeri-Configs](https://github.com/OkaeriPoland/okaeri-configs) - Configuration library
+- [xSeries](https://github.com/CryptoMorin/XSeries) - Cross-version compatibility
+- [TriumphGui](https://github.com/TriumphTeam/triumph-gui) - GUI library
+- [EternalCodeCommons](https://github.com/EternalCodeTeam/EternalCodeCommons) - Utilities
+- [Multification](https://github.com/EternalCodeTeam/Multification) - Messages
+- [ORMLite](https://ormlite.com/) - Database ORM
 - [FancyHolograms](https://github.com/FancyInnovations/FancyHolograms) - Hologram API
-- [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) - Placeholder support
+- [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) - Placeholders
+
+## License
+See [LICENSE](LICENSE.MD).
