@@ -37,6 +37,7 @@ interface SkyGenGeneratorsApi {
         interval: Duration,
         ownerId: UUID?,
         location: Location,
+        activationRadius: Double? = null,
     ): CompletableFuture<Generator>
 
     /**

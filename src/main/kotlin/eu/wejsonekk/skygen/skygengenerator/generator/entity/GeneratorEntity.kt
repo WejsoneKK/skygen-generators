@@ -22,6 +22,9 @@ class GeneratorEntity(
     @field:DatabaseField(columnName = "interval_millis")
     var intervalMillis: Long = 60_000L,
 
+    @field:DatabaseField(columnName = "activation_radius", canBeNull = true)
+    var activationRadius: Double? = null,
+
     @field:DatabaseField(columnName = "owner_id")
     var ownerId: UUID? = null,
 

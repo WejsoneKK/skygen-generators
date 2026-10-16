@@ -113,6 +113,7 @@ class GeneratorManager(
             return false
         }
 
-        return world.getNearbyPlayers(location, this.generatorConfig.activationRadius).isNotEmpty()
+        val radius = generator.activationRadius ?: this.generatorConfig.activationRadius
+        return world.getNearbyPlayers(location, radius).isNotEmpty()
     }
 }

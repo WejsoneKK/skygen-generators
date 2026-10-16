@@ -25,6 +25,12 @@ interface Generator {
     /** Interval between cycles. */
     val interval: Duration
 
+    /**
+     * Optional per generator activation radius (in blocks). When `null` the
+     * global `generators.yml` value is used.
+     */
+    val activationRadius: Double?
+
     /** Optional owner used by personal boosts. */
     val ownerId: UUID?
 

@@ -16,6 +16,7 @@ data class GeneratorImpl(
     override val material: XMaterial,
     override val amount: Int,
     override val interval: Duration,
+    override val activationRadius: Double?,
     override val ownerId: UUID?,
     override val location: GeneratorLocation,
     override val enabled: Boolean,
@@ -29,6 +30,8 @@ data class GeneratorImpl(
 
     fun withInterval(interval: Duration): GeneratorImpl =
         this.copy(interval = if (interval.isNegative || interval.isZero) Duration.ofSeconds(1) else interval)
+
+    fun withActivationRadius(activationRadius: Double?): GeneratorImpl = this.copy(activationRadius = activationRadius)
 
     fun withEnabled(enabled: Boolean): GeneratorImpl = this.copy(enabled = enabled)
 

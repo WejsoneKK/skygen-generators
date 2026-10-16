@@ -8,6 +8,8 @@ import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import com.cryptomorin.xseries.XMaterial
 import eu.wejsonekk.skygen.skygengenerator.config.ConfigService
+import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
+import eu.wejsonekk.skygen.skygengenerator.generator.argument.GeneratorId
 import eu.wejsonekk.skygen.skygengenerator.generator.gui.GeneratorEditGui
 import eu.wejsonekk.skygen.skygengenerator.generator.gui.GeneratorListGui
 import eu.wejsonekk.skygen.skygengenerator.generator.hologram.GeneratorHologramManager
@@ -17,7 +19,6 @@ import eu.wejsonekk.skygen.skygengenerator.genboost.manager.GenBoostManager
 import eu.wejsonekk.skygen.skygengenerator.notice.NoticeService
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -36,7 +37,7 @@ class GeneratorCommand(
     private val genBoostManager: GenBoostManager,
     private val noticeService: NoticeService,
     private val configService: ConfigService,
-    private val miniMessage: MiniMessage,
+    private val generatorConfig: GeneratorConfig,
 ) {
 
     @Execute
@@ -92,12 +93,12 @@ class GeneratorCommand(
 
     @Execute(name = "remove")
     @Permission("skygen.command.remove")
-    fun remove(@Context sender: CommandSender, @Arg("id") id: String) {
-        this.service.removeGenerator(id).thenAccept { removed -> this.runMain {
+    fun remove(@Context sender: CommandSender, @Arg("id") id: GeneratorId) {
+        this.service.removeGenerator(id.value).thenAccept { removed -> this.runMain {
             val notice = if (removed) {
-                this.noticeService.create().viewer(sender).notice { it.generatorRemoved }.placeholder("{id}", id)
+                this.noticeService.create().viewer(sender).notice { it.generatorRemoved }.placeholder("{id}", id.value)
             } else {
-                this.noticeService.create().viewer(sender).notice { it.generatorNotFound }.placeholder("{id}", id)
+                this.noticeService.create().viewer(sender).notice { it.generatorNotFound }.placeholder("{id}", id.value)
             }
             notice.send()
         } }
@@ -105,30 +106,30 @@ class GeneratorCommand(
 
     @Execute(name = "edit")
     @Permission("skygen.command.edit")
-    fun edit(@Context player: Player, @Arg("id") id: String) {
-        this.service.generator(id).thenAccept { generator -> this.runMain {
+    fun edit(@Context player: Player, @Arg("id") id: GeneratorId) {
+        this.service.generator(id.value).thenAccept { generator -> this.runMain {
             if (generator == null) {
                 this.noticeService.create()
                     .viewer(player)
                     .notice { it.generatorNotFound }
-                    .placeholder("{id}", id)
+                    .placeholder("{id}", id.value)
                     .send()
                 return@runMain
             }
-            GeneratorEditGui(this.service, this.miniMessage, generator).open(player)
+            GeneratorEditGui(this.service, generator, this.generatorConfig).open(player)
         } }
     }
 
     @Execute(name = "tp")
     @Permission("skygen.command.tp")
-    fun teleport(@Context player: Player, @Arg("id") id: String) {
-        this.service.generator(id).thenAccept { generator -> this.runMain {
+    fun teleport(@Context player: Player, @Arg("id") id: GeneratorId) {
+        this.service.generator(id.value).thenAccept { generator -> this.runMain {
             val location = generator?.location?.toBukkitLocation()
             if (generator == null || location == null) {
                 this.noticeService.create()
                     .viewer(player)
                     .notice { it.generatorNotFound }
-                    .placeholder("{id}", id)
+                    .placeholder("{id}", id.value)
                     .send()
                 return@runMain
             }
@@ -155,7 +156,7 @@ class GeneratorCommand(
                 this.noticeService.create().viewer(player).notice { it.generatorListEmpty }.send()
                 return@runMain
             }
-            GeneratorListGui(this.service, this.miniMessage, generators.toList()).open(player)
+            GeneratorListGui(this.service, generators.toList(), this.generatorConfig).open(player)
         } }
     }
 

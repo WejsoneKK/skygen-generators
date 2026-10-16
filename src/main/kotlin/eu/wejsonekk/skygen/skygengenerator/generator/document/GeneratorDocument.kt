@@ -11,6 +11,7 @@ data class GeneratorDocument(
     val material: String,
     val amount: Int,
     val intervalMillis: Long,
+    val activationRadius: Double?,
     val ownerId: String?,
     val world: String,
     val x: Int,
@@ -25,6 +26,7 @@ data class GeneratorDocument(
         .append(MATERIAL, this.material)
         .append(AMOUNT, this.amount)
         .append(INTERVAL_MILLIS, this.intervalMillis)
+        .append(ACTIVATION_RADIUS, this.activationRadius)
         .append(OWNER_ID, this.ownerId)
         .append(WORLD, this.world)
         .append(X, this.x)
@@ -41,6 +43,7 @@ data class GeneratorDocument(
         const val MATERIAL = "material"
         const val AMOUNT = "amount"
         const val INTERVAL_MILLIS = "intervalMillis"
+        const val ACTIVATION_RADIUS = "activationRadius"
         const val OWNER_ID = "ownerId"
         const val WORLD = "world"
         const val X = "x"
@@ -56,6 +59,7 @@ data class GeneratorDocument(
             material = document.getString(MATERIAL) ?: "STONE",
             amount = document.getInteger(AMOUNT, 1),
             intervalMillis = document.getLong(INTERVAL_MILLIS) ?: 60_000L,
+            activationRadius = document.getDouble(ACTIVATION_RADIUS),
             ownerId = document.getString(OWNER_ID),
             world = document.getString(WORLD) ?: "world",
             x = document.getInteger(X, 0),

@@ -56,6 +56,7 @@ class GeneratorService(
             material = this.material,
             amount = this.amount,
             interval = this.interval,
+            activationRadius = this.activationRadius,
             ownerId = this.ownerId,
             location = this.location,
             enabled = this.enabled,
@@ -70,6 +71,7 @@ class GeneratorService(
             material = this.material,
             amount = this.amount,
             interval = this.interval,
+            activationRadius = this.activationRadius,
             ownerId = this.ownerId,
             location = this.location,
             enabled = enabled,
@@ -144,6 +146,7 @@ class GeneratorService(
         interval: Duration,
         ownerId: UUID?,
         location: Location,
+        activationRadius: Double?,
     ): CompletableFuture<Generator> {
         if (this.cache.containsKey(id)) {
             return CompletableFuture.failedFuture(
@@ -156,6 +159,7 @@ class GeneratorService(
             material = material,
             amount = amount.coerceAtLeast(1),
             interval = if (interval.isNegative || interval.isZero) Duration.ofSeconds(1) else interval,
+            activationRadius = activationRadius,
             ownerId = ownerId,
             location = GeneratorLocation.from(location),
             enabled = true,
