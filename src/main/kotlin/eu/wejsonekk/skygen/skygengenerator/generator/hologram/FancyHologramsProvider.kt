@@ -4,6 +4,7 @@ import de.oliver.fancyholograms.api.FancyHologramsPlugin
 import de.oliver.fancyholograms.api.data.TextHologramData
 import de.oliver.fancyholograms.api.hologram.Hologram
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
+import eu.wejsonekk.skygen.skygengenerator.util.Placeholders
 import org.bukkit.Location
 import org.bukkit.entity.Display
 
@@ -24,11 +25,12 @@ class FancyHologramsProvider(
 
     override fun render(generatorId: String, lines: List<String>, location: Location) {
         val hologramLocation = this.hologramLocation(location)
+        val resolved = lines.map { Placeholders.apply(null, it) }
 
         val existing = this.holograms[generatorId]
         if (existing != null) {
             val data = existing.data as? TextHologramData ?: return
-            data.setText(lines)
+            data.setText(resolved)
             data.setLocation(hologramLocation)
             existing.queueUpdate()
             return
@@ -42,7 +44,7 @@ class FancyHologramsProvider(
         data.setBillboard(Display.Billboard.CENTER)
         data.setSeeThrough(false)
         data.setTextShadow(true)
-        data.setText(lines)
+        data.setText(resolved)
 
         val hologram = this.manager.create(data)
         this.manager.addHologram(hologram)

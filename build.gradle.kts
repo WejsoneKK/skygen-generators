@@ -13,6 +13,7 @@ repositories {
     maven("https://repo.okaeri.cloud/releases")
     maven("https://repo.eternalcode.pl/releases")
     maven("https://repo.fancyinnovations.com/releases")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
 dependencies {
@@ -42,6 +43,7 @@ dependencies {
     paperLibrary(libs.xseries)
 
     compileOnly(libs.fancyholograms)
+    compileOnly(libs.placeholderapi)
 }
 paper {
     name = "wSkyGenGenerators"
@@ -59,6 +61,10 @@ paper {
         register("FancyHolograms") {
             required = false
             load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.AFTER
+        }
+        register("PlaceholderAPI") {
+            required = false
+            load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.BEFORE
         }
     }
 }

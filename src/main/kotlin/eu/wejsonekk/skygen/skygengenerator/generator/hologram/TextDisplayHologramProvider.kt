@@ -1,8 +1,8 @@
 package eu.wejsonekk.skygen.skygengenerator.generator.hologram
 
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
+import eu.wejsonekk.skygen.skygengenerator.util.Text
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Location
 import org.bukkit.entity.Display
 import org.bukkit.entity.TextDisplay
@@ -13,7 +13,6 @@ import org.bukkit.entity.TextDisplay
  */
 class TextDisplayHologramProvider(
     private val config: GeneratorConfig,
-    private val miniMessage: MiniMessage,
 ) : GeneratorHologramProvider {
 
     override val id: String = "TEXT_DISPLAY"
@@ -31,7 +30,7 @@ class TextDisplayHologramProvider(
         }
 
         this.displays[generatorId] = display
-        display.text(this.miniMessage.deserialize(lines.joinToString("\n")))
+        display.text(Text.parse(lines.joinToString("\n")))
     }
 
     override fun remove(generatorId: String) {

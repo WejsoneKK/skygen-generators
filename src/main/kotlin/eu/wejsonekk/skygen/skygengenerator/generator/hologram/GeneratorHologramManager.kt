@@ -4,7 +4,6 @@ import eu.wejsonekk.skygen.skygengenerator.api.generator.Generator
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
 import eu.wejsonekk.skygen.skygengenerator.generator.service.GeneratorService
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -27,7 +26,6 @@ class GeneratorHologramManager(
     private val plugin: Plugin,
     private val service: GeneratorService,
     private val config: GeneratorConfig,
-    private val miniMessage: MiniMessage,
     private val logger: Logger,
 ) {
 
@@ -90,7 +88,7 @@ class GeneratorHologramManager(
 
         val status = when {
             !generator.enabled -> this.config.hologramDisabledLine
-            this.config.requireNearbyPlayer && !this.hasNearbyPlayer(world, location) -> this.config.hologramWaitingLine
+            this.config.requireNearbyPlayer && !this.hasNearbyPlayer(world, location, generator) -> this.config.hologramWaitingLine
             else -> {
                 val base = generator.lastGenerationAt ?: generator.createdAt
                 val remaining = Duration.between(now, base.plus(generator.interval)).coerceAtLeast(Duration.ZERO)
@@ -101,11 +99,11 @@ class GeneratorHologramManager(
         return listOf(header, status)
     }
 
-    private fun hasNearbyPlayer(world: World, location: Location): Boolean =
-        world.getNearbyPlayers(location, this.config.activationRadius).isNotEmpty()
+    private fun hasNearbyPlayer(world: World, location: Location, generator: Generator): Boolean =
+        world.getNearbyPlayers(location, generator.activationRadius ?: this.config.activationRadius).isNotEmpty()
 
     private fun resolveProvider(): GeneratorHologramProvider {
-        val textDisplay = TextDisplayHologramProvider(this.config, this.miniMessage)
+        val textDisplay = TextDisplayHologramProvider(this.config)
         val provider = when (this.config.hologramProvider) {
             HologramProvider.TEXT_DISPLAY -> textDisplay
             HologramProvider.FANCY_HOLOGRAMS, HologramProvider.AUTO -> this.fancyHolograms() ?: textDisplay

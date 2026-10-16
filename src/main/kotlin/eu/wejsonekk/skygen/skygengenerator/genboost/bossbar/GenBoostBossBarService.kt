@@ -3,9 +3,9 @@ package eu.wejsonekk.skygen.skygengenerator.genboost.bossbar
 import eu.wejsonekk.skygen.skygengenerator.api.genboost.GenBoostType
 import eu.wejsonekk.skygen.skygengenerator.genboost.model.ActiveGenBoost
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
+import eu.wejsonekk.skygen.skygengenerator.util.Text
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.time.Duration
@@ -19,9 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * All methods must be called from the main thread.
  */
-class GenBoostBossBarService(
-    private val miniMessage: MiniMessage,
-) {
+class GenBoostBossBarService {
 
     private val boostBars = ConcurrentHashMap<UUID, BossBar>()
 
@@ -75,13 +73,13 @@ class GenBoostBossBarService(
     private fun title(active: ActiveGenBoost, now: Instant): Component {
         val remaining = DurationFormat.format(active.remaining(now))
         val prefix = if (active.type == GenBoostType.GLOBAL) "Globalny" else "Personalny"
-        return this.miniMessage.deserialize(
+        return Text.parse(
             "<gradient:#ffb300:#ff6f00>$prefix GenBoost</gradient> <dark_gray>|</dark_gray> " +
                 "<white>${active.name} <gray>x${active.multiplier} <dark_gray>|</dark_gray> <yellow>$remaining",
         )
     }
 
-    private fun countdownTitle(remaining: Duration): Component = this.miniMessage.deserialize(
+    private fun countdownTitle(remaining: Duration): Component = Text.parse(
         "<gold>Nastepne losowanie GenBoost za <white>${DurationFormat.format(remaining)}",
     )
 
