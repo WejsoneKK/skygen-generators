@@ -30,7 +30,9 @@ class DatabaseManager(
             addDataSourceProperty("prepStmtCacheSize", "250")
             addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
             maximumPoolSize = databaseConfig.poolSize
+            minimumIdle = databaseConfig.minimumIdle
             connectionTimeout = databaseConfig.connectionTimeout.toLong()
+            idleTimeout = databaseConfig.idleTimeout.toLong()
             maxLifetime = databaseConfig.maxLifetime.toLong()
             username = databaseConfig.username
             password = databaseConfig.password
@@ -74,14 +76,14 @@ class DatabaseManager(
 
     fun disconnect() {
         try {
-
-        }catch (e: Exception) {
+            connectionSource?.close()
+        } catch (e: Exception) {
             logger.warn("Failed to disconnect from database: {}", e.message)
-        }finally {
+        } finally {
             connectionSource = null
+            dataSource?.close()
+            dataSource = null
+            cachedDao.clear()
         }
-        dataSource?.close()
-        dataSource = null
-        cachedDao.clear()
     }
 }

@@ -12,5 +12,6 @@ interface DatabaseSettings {
     val connectionTimeout: Int
     val idleTimeout: Int
     val poolSize: Int
+    val minimumIdle: Int
     val maxLifetime: Int
 }
