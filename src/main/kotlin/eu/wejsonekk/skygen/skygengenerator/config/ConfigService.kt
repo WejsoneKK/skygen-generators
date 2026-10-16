@@ -5,53 +5,60 @@ import com.eternalcode.multification.notice.resolver.sound.SoundAdventureResolve
 import com.eternalcode.multification.okaeri.MultificationSerdesPack
 import eu.okaeri.configs.ConfigManager
 import eu.okaeri.configs.OkaeriConfig
-import eu.okaeri.configs.serdes.OkaeriSerdes
-import eu.okaeri.configs.serdes.SerdesRegistry
 import eu.okaeri.configs.serdes.adventure.SerdesAdventure
 import eu.okaeri.configs.serdes.commons.SerdesCommons
-import eu.okaeri.configs.serdes.commons.serializer.InstantSerializer
+import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer
 import java.io.File
-import java.time.Instant
 
+/**
+ * Central factory / registry for every [OkaeriConfig] used by the plugin.
+ *
+ * Each config is created with a fixed set of serdes packs (commons, adventure,
+ * multification) so that [java.time.Duration], [java.time.Instant], MiniMessage
+ * [com.eternalcode.multification.notice.Notice]s and nested sub-configs are all
+ * serialized automatically. Call [saveAll] before shutdown to flush changes.
+ */
 class ConfigService {
-    private val configs = mutableSetOf<OkaeriConfig>()
 
-    // Wygodny skrót dla Kotlina: service.create<MyConfig>(file)
-    inline fun <reified T : OkaeriConfig> create(file: File): T =
-        create(T::class.java, file)
+    private val configs = LinkedHashMap<Class<out OkaeriConfig>, OkaeriConfig>()
 
-    fun <T : OkaeriConfig> create(config: Class<T>, file: File): T {
+    inline fun <reified T : OkaeriConfig> create(file: File): T = this.create(T::class.java, file)
+
+    fun <T : OkaeriConfig> create(type: Class<T>, file: File): T {
         val noticeRegistry = NoticeResolverDefaults.createRegistry()
             .registerResolver(SoundAdventureResolver())
 
-        val configFile = ConfigManager.create(config).apply {
-            withConfigurer(
-                YamlSnakeYamlConfigurer(),
-                SerdesCommons(),
-                SerdesAdventure(),
-                DefaultSerdesPack,
-                MultificationSerdesPack(noticeRegistry)
-            )
-            withBindFile(file)
-            withRemoveOrphans(true)
+        val config = ConfigManager.create(type).apply {
+            configure { options ->
+                options.configurer(
+                    YamlSnakeYamlConfigurer(),
+                    SerdesCommons(),
+                    SerdesBukkit(),
+                    SerdesAdventure(),
+                    MultificationSerdesPack(noticeRegistry),
+                )
+                options.bindFile(file)
+                options.removeOrphans(true)
+            }
             saveDefaults()
             load(true)
         }
 
-        configs += configFile
-        return configFile
+        this.configs[type] = config
+        return config
     }
 
     fun reload() {
-        configs.forEach { it.load() }
+        this.configs.values.forEach { it.load() }
     }
 
-    private object DefaultSerdesPack : OkaeriSerdes {
-        override fun register(registry: SerdesRegistry) {
-            registry.register(SerdesCommons())
-            registry.register(SerdesAdventure())
-            registry.registerExclusive(Instant::class.java, InstantSerializer(false))
-        }
+    fun saveAll() {
+        this.configs.values.forEach { it.save() }
     }
+
+    inline fun <reified T : OkaeriConfig> get(): T? = this.get(T::class.java)
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : OkaeriConfig> get(type: Class<T>): T? = this.configs[type] as T?
 }
