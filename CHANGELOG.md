@@ -4,6 +4,12 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.2] - 2026-10-17
+
+### Changed
+- Zaktualizowano `README` (funkcje, komendy, biblioteki) i dodano notkę o wykorzystaniu AI wraz z modelem.
+- Zmieniono kontrybutora z `ClaudeCode` na `OpenCode`.
+
 ## [0.3.0-alpha.1] - 2026-10-17
 
 ### Added

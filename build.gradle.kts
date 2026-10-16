@@ -53,7 +53,7 @@ paper {
     bootstrapper = "eu.wejsonekk.skygen.skygengenerator.SkyGenGeneratorPluginBootstrap"
     apiVersion = "1.21"
     author = "WejsoneKKEU"
-    contributors = listOf("ClaudeCode")
+    contributors = listOf("OpenCode")
     description = "Generators for SkyGen modes"
     hasOpenClassloader = true
     generateLibrariesJson = true
