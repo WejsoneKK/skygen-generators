@@ -19,7 +19,10 @@ h2database = "2.1.214"
 hikaricp = "7.1.0"
 mariadb = "3.5.1"
 postgresql = "42.7.5"
+mongodb = "5.5.1"
 caffeine = "3.1.8"
+xseries = "14.0.0"
+fancyholograms = "2.10.0"
 
 [libraries]
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
@@ -28,12 +31,16 @@ ormlite-jdbc = { module = "com.j256.ormlite:ormlite-jdbc", version.ref = "orm-li
 h2database = { module = "com.h2database:h2", version.ref = "h2database"}
 mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb"}
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql"}
+mongodb-driver-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb"}
+xseries = { module = "com.github.cryptomorin:XSeries", version.ref = "xseries"}
+fancyholograms = { module = "de.oliver:FancyHolograms", version.ref = "fancyholograms"}
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp"}
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine"}
 okaeri-configs-yaml = { module = "eu.okaeri:okaeri-configs-yaml-snakeyaml", version.ref = "okaeri-configs"}
 okaeri-configs-json-simple = { module = "eu.okaeri:okaeri-configs-json-simple", version.ref = "okaeri-configs"}
 okaeri-configs-yam-bukkit = { module = "eu.okaeri:okaeri-configs-yaml-bukkit", version.ref = "okaeri-configs"}
 okaeri-configs-serdes-adventure = { module = "eu.okaeri:okaeri-configs-serdes-adventure", version.ref = "okaeri-configs"}
+okaeri-configs-serdes-bukkit = { module = "eu.okaeri:okaeri-configs-serdes-bukkit", version.ref = "okaeri-configs"}
 okaeri-placeholders-adventure = { module = "eu.okaeri:okaeri-placeholders-adventure", version.ref = "okaeri-placeholders"}
 okaeri-placeholders-bukkit = { module = "eu.okaeri:okaeri-placeholders-bukkit", version.ref = "okaeri-placeholders"}
 triumph-gui = { module = "dev.triumphteam:triumph-gui", version.ref = "triumph-gui"}

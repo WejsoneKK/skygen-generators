@@ -12,6 +12,7 @@ repositories {
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://repo.okaeri.cloud/releases")
     maven("https://repo.eternalcode.pl/releases")
+    maven("https://repo.fancyinnovations.com/releases")
 }
 
 dependencies {
@@ -26,6 +27,7 @@ dependencies {
     paperLibrary(libs.okaeri.placeholders.bukkit)
     paperLibrary(libs.okaeri.placeholders.adventure)
     paperLibrary(libs.okaeri.configs.serdes.adventure)
+    paperLibrary(libs.okaeri.configs.serdes.bukkit)
     paperLibrary(libs.okaeri.configs.yam.bukkit)
     paperLibrary(libs.okaeri.configs.yaml)
     paperLibrary(libs.okaeri.configs.json.simple)
@@ -36,6 +38,10 @@ dependencies {
     paperLibrary(libs.hikaricp)
     paperLibrary(libs.postgresql)
     paperLibrary(libs.mariadb)
+    paperLibrary(libs.mongodb.driver.sync)
+    paperLibrary(libs.xseries)
+
+    compileOnly(libs.fancyholograms)
 }
 paper {
     name = "wSkyGenGenerators"
@@ -49,6 +55,12 @@ paper {
     description = "Generators for SkyGen modes"
     hasOpenClassloader = true
     generateLibrariesJson = true
+    serverDependencies {
+        register("FancyHolograms") {
+            required = false
+            load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.AFTER
+        }
+    }
 }
 kotlin {
     jvmToolchain(23)
