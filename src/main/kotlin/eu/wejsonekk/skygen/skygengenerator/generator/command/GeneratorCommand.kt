@@ -1,0 +1,175 @@
+package eu.wejsonekk.skygen.skygengenerator.generator.command
+
+import dev.rollczi.litecommands.annotations.argument.Arg
+import dev.rollczi.litecommands.annotations.argument.CaseInsensitive
+import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
+import dev.rollczi.litecommands.annotations.execute.Execute
+import dev.rollczi.litecommands.annotations.permission.Permission
+import com.cryptomorin.xseries.XMaterial
+import eu.wejsonekk.skygen.skygengenerator.config.ConfigService
+import eu.wejsonekk.skygen.skygengenerator.generator.gui.GeneratorEditGui
+import eu.wejsonekk.skygen.skygengenerator.generator.gui.GeneratorListGui
+import eu.wejsonekk.skygen.skygengenerator.generator.hologram.GeneratorHologramManager
+import eu.wejsonekk.skygen.skygengenerator.generator.manager.GeneratorManager
+import eu.wejsonekk.skygen.skygengenerator.generator.service.GeneratorService
+import eu.wejsonekk.skygen.skygengenerator.genboost.manager.GenBoostManager
+import eu.wejsonekk.skygen.skygengenerator.notice.NoticeService
+import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
+import java.time.Duration
+
+/**
+ * `/generator` command tree.
+ */
+@Command(name = "generator", aliases = ["skygen", "sg"])
+class GeneratorCommand(
+    private val plugin: Plugin,
+    private val service: GeneratorService,
+    private val manager: GeneratorManager,
+    private val hologramManager: GeneratorHologramManager,
+    private val genBoostManager: GenBoostManager,
+    private val noticeService: NoticeService,
+    private val configService: ConfigService,
+    private val miniMessage: MiniMessage,
+) {
+
+    @Execute
+    fun help(@Context sender: CommandSender) {
+        val message = Component.text()
+            .append(Component.text("/generator create <id> <material> <amount> <time>\n"))
+            .append(Component.text("/generator remove <id>\n"))
+            .append(Component.text("/generator edit <id>\n"))
+            .append(Component.text("/generator tp <id>\n"))
+            .append(Component.text("/generator list\n"))
+            .append(Component.text("/generator reload"))
+            .build()
+        sender.sendMessage(message)
+    }
+
+    @Execute(name = "create")
+    @Permission("skygen.command.create")
+    fun create(
+        @Context player: Player,
+        @Arg("id") id: String,
+        @Arg("material") @CaseInsensitive material: XMaterial,
+        @Arg("amount") amount: Int,
+        @Arg("time") time: Duration,
+    ) {
+        if (!material.isSupported() || material.parseItem() == null) {
+            this.noticeService.create()
+                .viewer(player)
+                .notice { it.generatorMaterialInvalid }
+                .placeholder("{material}", material.name)
+                .send()
+            return
+        }
+
+        this.service.createGenerator(id, material, amount, time, player.uniqueId, player.location)
+            .thenAccept { generator -> this.runMain {
+                this.noticeService.create()
+                    .viewer(player)
+                    .notice { it.generatorCreated }
+                    .placeholder("{id}", generator.id)
+                    .placeholder("{material}", generator.material.name)
+                    .placeholder("{amount}", generator.amount.toString())
+                    .placeholder("{time}", DurationFormat.format(generator.interval))
+                    .send()
+            } }
+            .exceptionally { throwable -> this.runMain {
+                this.noticeService.create()
+                    .viewer(player)
+                    .notice { it.generatorCreateFailed }
+                    .placeholder("{error}", throwable.cause?.message ?: throwable.message ?: "unknown")
+                    .send()
+            }; null }
+    }
+
+    @Execute(name = "remove")
+    @Permission("skygen.command.remove")
+    fun remove(@Context sender: CommandSender, @Arg("id") id: String) {
+        this.service.removeGenerator(id).thenAccept { removed -> this.runMain {
+            val notice = if (removed) {
+                this.noticeService.create().viewer(sender).notice { it.generatorRemoved }.placeholder("{id}", id)
+            } else {
+                this.noticeService.create().viewer(sender).notice { it.generatorNotFound }.placeholder("{id}", id)
+            }
+            notice.send()
+        } }
+    }
+
+    @Execute(name = "edit")
+    @Permission("skygen.command.edit")
+    fun edit(@Context player: Player, @Arg("id") id: String) {
+        this.service.generator(id).thenAccept { generator -> this.runMain {
+            if (generator == null) {
+                this.noticeService.create()
+                    .viewer(player)
+                    .notice { it.generatorNotFound }
+                    .placeholder("{id}", id)
+                    .send()
+                return@runMain
+            }
+            GeneratorEditGui(this.service, this.miniMessage, generator).open(player)
+        } }
+    }
+
+    @Execute(name = "tp")
+    @Permission("skygen.command.tp")
+    fun teleport(@Context player: Player, @Arg("id") id: String) {
+        this.service.generator(id).thenAccept { generator -> this.runMain {
+            val location = generator?.location?.toBukkitLocation()
+            if (generator == null || location == null) {
+                this.noticeService.create()
+                    .viewer(player)
+                    .notice { it.generatorNotFound }
+                    .placeholder("{id}", id)
+                    .send()
+                return@runMain
+            }
+
+            player.teleportAsync(location.clone().add(0.5, 1.0, 0.5)).thenAccept { success ->
+                if (success) {
+                    this.runMain {
+                        this.noticeService.create()
+                            .viewer(player)
+                            .notice { it.generatorTeleported }
+                            .placeholder("{id}", generator.id)
+                            .send()
+                    }
+                }
+            }
+        } }
+    }
+
+    @Execute(name = "list")
+    @Permission("skygen.command.list")
+    fun list(@Context player: Player) {
+        this.service.generators().thenAccept { generators -> this.runMain {
+            if (generators.isEmpty()) {
+                this.noticeService.create().viewer(player).notice { it.generatorListEmpty }.send()
+                return@runMain
+            }
+            GeneratorListGui(this.service, this.miniMessage, generators.toList()).open(player)
+        } }
+    }
+
+    @Execute(name = "reload")
+    @Permission("skygen.command.reload")
+    fun reload(@Context sender: CommandSender) {
+        this.configService.reload()
+        this.manager.start()
+        this.hologramManager.start()
+        this.genBoostManager.start()
+        this.noticeService.create().viewer(sender).notice { it.reloadSuccess }.send()
+    }
+
+    private fun runMain(block: () -> Unit) {
+        Bukkit.getScheduler().runTask(this.plugin, Runnable(block))
+    }
+}
