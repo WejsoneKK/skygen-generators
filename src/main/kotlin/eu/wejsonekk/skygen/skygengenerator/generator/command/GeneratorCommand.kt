@@ -7,6 +7,8 @@ import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import dev.rollczi.litecommands.annotations.permission.Permission
 import com.cryptomorin.xseries.XMaterial
+import dev.rollczi.litecommands.annotations.execute.ExecuteDefault
+import dev.rollczi.litecommands.strict.StrictMode
 import eu.wejsonekk.skygen.skygengenerator.config.ConfigService
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
 import eu.wejsonekk.skygen.skygengenerator.generator.argument.GeneratorId
@@ -25,10 +27,8 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.time.Duration
 
-/**
- * `/generator` command tree.
- */
-@Command(name = "generator", aliases = ["skygen", "sg"])
+@Command(name = "wskygenerator", aliases = ["wsg","skygen", "generator", "wgen" ,"wgenerator", "wgens","sg", "wskygen"])
+@Permission("wskygenerator.command.admin")
 class GeneratorCommand(
     private val plugin: Plugin,
     private val service: GeneratorService,
@@ -40,21 +40,15 @@ class GeneratorCommand(
     private val generatorConfig: GeneratorConfig,
 ) {
 
-    @Execute
+    @Execute(name = "help", aliases = ["?", "pomoc"])
     fun help(@Context sender: CommandSender) {
-        val message = Component.text()
-            .append(Component.text("/generator create <id> <material> <amount> <time>\n"))
-            .append(Component.text("/generator remove <id>\n"))
-            .append(Component.text("/generator edit <id>\n"))
-            .append(Component.text("/generator tp <id>\n"))
-            .append(Component.text("/generator list\n"))
-            .append(Component.text("/generator reload"))
-            .build()
-        sender.sendMessage(message)
+        this.noticeService.create()
+            .viewer(sender)
+            .notice { it.generatorHelpCommand }
+            .send()
     }
-
     @Execute(name = "create")
-    @Permission("skygen.command.create")
+    @Permission("wskygenerator.command.create")
     fun create(
         @Context player: Player,
         @Arg("id") id: String,
@@ -92,7 +86,7 @@ class GeneratorCommand(
     }
 
     @Execute(name = "remove")
-    @Permission("skygen.command.remove")
+    @Permission("wskygenerator.command.remove")
     fun remove(@Context sender: CommandSender, @Arg("id") id: GeneratorId) {
         this.service.removeGenerator(id.value).thenAccept { removed -> this.runMain {
             val notice = if (removed) {
@@ -105,7 +99,7 @@ class GeneratorCommand(
     }
 
     @Execute(name = "edit")
-    @Permission("skygen.command.edit")
+    @Permission("wskygenerator.command.edit")
     fun edit(@Context player: Player, @Arg("id") id: GeneratorId) {
         this.service.generator(id.value).thenAccept { generator -> this.runMain {
             if (generator == null) {
@@ -121,7 +115,7 @@ class GeneratorCommand(
     }
 
     @Execute(name = "tp")
-    @Permission("skygen.command.tp")
+    @Permission("wskygenerator.command.tp")
     fun teleport(@Context player: Player, @Arg("id") id: GeneratorId) {
         this.service.generator(id.value).thenAccept { generator -> this.runMain {
             val location = generator?.location?.toBukkitLocation()
@@ -149,7 +143,7 @@ class GeneratorCommand(
     }
 
     @Execute(name = "list")
-    @Permission("skygen.command.list")
+    @Permission("wskygenerator.command.list")
     fun list(@Context player: Player) {
         this.service.generators().thenAccept { generators -> this.runMain {
             if (generators.isEmpty()) {
@@ -161,7 +155,7 @@ class GeneratorCommand(
     }
 
     @Execute(name = "reload")
-    @Permission("skygen.command.reload")
+    @Permission("wskygenerator.command.reload")
     fun reload(@Context sender: CommandSender) {
         this.configService.reload()
         this.manager.start()

@@ -18,22 +18,25 @@ import java.time.Duration
 /**
  * `/genboost` command tree.
  */
-@Command(name = "genboost", aliases = ["gb", "genboosts"])
+@Command(name = "genboost", aliases = ["gb", "genboosts", "wgb", "wgenboosts", "genboosty", "wgenboost"])
+@Permission("wskygenerator.command.genboost")
 class GenBoostCommand(
     private val service: GenBoostService,
     private val noticeService: NoticeService,
     private val configService: ConfigService,
 ) {
 
-    @Execute
+    @Execute(name = "help", aliases = ["?", "pomoc"])
     fun help(@Context sender: CommandSender) {
-        sender.sendMessage("/genboost give <player> <multiplier> <time>")
-        sender.sendMessage("/genboost give-all <multiplier> <time>")
-        sender.sendMessage("/genboost set-item <personal|global>")
+
+        this.noticeService.create()
+            .viewer(sender)
+            .notice { it.genBoostHelpCommand }
+            .send()
     }
 
     @Execute(name = "give")
-    @Permission("skygen.command.genboost.give")
+    @Permission("wskygenerator.command.genboost.give")
     fun give(
         @Context sender: CommandSender,
         @Arg("player") target: Player,
@@ -48,7 +51,7 @@ class GenBoostCommand(
     }
 
     @Execute(name = "give-all")
-    @Permission("skygen.command.genboost.giveall")
+    @Permission("wskygenerator.command.genboost.giveall")
     fun giveAll(
         @Context sender: CommandSender,
         @Arg("multiplier") multiplier: Double,
@@ -70,10 +73,10 @@ class GenBoostCommand(
     }
 
     @Execute(name = "set-item")
-    @Permission("skygen.command.genboost.setitem")
+    @Permission("wskygenerator.command.genboost.setitem")
     fun setItem(
         @Context player: Player,
-        @Arg("type") @CaseInsensitive type: GenBoostType,
+        @Arg("type") @CaseInsensitive() type: GenBoostType,
     ) {
         val item = player.inventory.itemInMainHand
         if (item.type.isAir) {

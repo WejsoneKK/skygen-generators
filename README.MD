@@ -28,7 +28,7 @@ system and a fully configurable GUI.
 
 ## Commands
 
-Base command: `/generator` (aliases: `/skygen`, `/sg`)
+Base command: `/wskygenerator` (aliases: `/skygen`, `/sg`)
 
 | Command                                             | Description                            | Permission              |
 | --------------------------------------------------- | -------------------------------------- | ----------------------- |
@@ -52,16 +52,16 @@ Base command: `/genboost` (aliases: `/gb`, `/genboosts`)
 ## Permissions
 
 | Permission                         | Description                                 |
-| ---------------------------------- | ------------------------------------------- |
-| `skygen.command.create`            | Allows creating generators                  |
-| `skygen.command.remove`            | Allows removing generators                  |
-| `skygen.command.edit`              | Allows opening the generator editor         |
-| `skygen.command.tp`                | Allows teleporting to a generator           |
-| `skygen.command.list`              | Allows listing generators                   |
-| `skygen.command.reload`            | Allows reloading the plugin                 |
-| `skygen.command.genboost.give`     | Allows giving personal boosts               |
-| `skygen.command.genboost.giveall`  | Allows giving global boosts                 |
-| `skygen.command.genboost.setitem`  | Allows changing the boost item template     |
+|------------------------------------| ------------------------------------------- |
+| `wskygenerator.command.create`            | Allows creating generators                  |
+| `wskygenerator.command.remove`            | Allows removing generators                  |
+| `wskygenerator.command.edit`              | Allows opening the generator editor         |
+| `wskygenerator.command.tp`                | Allows teleporting to a generator           |
+| `wskygenerator.command.list`              | Allows listing generators                   |
+| `wskygenerator.command.reload`            | Allows reloading the plugin                 |
+| `wskygenerator.command.genboost.give`     | Allows giving personal boosts               |
+| `wskygenerator.command.genboost.giveall`  | Allows giving global boosts                 |
+| `wskygenerator.command.genboost.setitem` | Allows changing the boost item template     |
 
 ## Building
 The project uses the Gradle Shadow plugin and targets Java 23.

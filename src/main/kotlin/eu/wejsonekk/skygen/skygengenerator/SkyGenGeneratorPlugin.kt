@@ -184,7 +184,13 @@ class SkyGenGeneratorPlugin : JavaPlugin() {
 
             StorageType.MONGO -> {
                 this.mongoManager.connect()
-                MongoGeneratorRepository(this.mongoManager, this.databaseExecutor)
+                MongoGeneratorRepository(this.mongoManager, this.databaseExecutor).also { repository ->
+                    repository.createIndexes().whenComplete { _, error ->
+                        if (error != null) {
+                            this.logger.warn("Failed to create MongoDB indexes: {}", error.message)
+                        }
+                    }
+                }
             }
         }
 

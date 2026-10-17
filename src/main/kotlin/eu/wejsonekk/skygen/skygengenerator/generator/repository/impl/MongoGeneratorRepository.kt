@@ -1,13 +1,15 @@
 package eu.wejsonekk.skygen.skygengenerator.generator.repository.impl
 
 import com.mongodb.client.model.Filters
-import com.mongodb.client.model.ReplaceOptions
+import com.mongodb.client.model.IndexModel
+import com.mongodb.client.model.Indexes
 import eu.wejsonekk.skygen.skygengenerator.api.generator.Generator
 import eu.wejsonekk.skygen.skygengenerator.database.mongo.AbstractRepositoryMongo
 import eu.wejsonekk.skygen.skygengenerator.database.mongo.MongoManager
 import eu.wejsonekk.skygen.skygengenerator.generator.adapter.GeneratorAdapter
 import eu.wejsonekk.skygen.skygengenerator.generator.document.GeneratorDocument
 import eu.wejsonekk.skygen.skygengenerator.generator.repository.GeneratorRepository
+import org.bson.Document
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
@@ -18,47 +20,38 @@ import java.util.concurrent.Executor
 class MongoGeneratorRepository(
     mongoManager: MongoManager,
     executor: Executor,
-) : AbstractRepositoryMongo<GeneratorDocument, String>(mongoManager, executor, GeneratorDocument.COLLECTION),
+) : AbstractRepositoryMongo<Generator, String>(mongoManager, executor, GeneratorDocument.COLLECTION),
     GeneratorRepository {
 
-    override fun save(generator: Generator): CompletableFuture<Void> {
-        val document = GeneratorAdapter.toDocument(generator)
-        return this.action { collection ->
-            collection.replaceOne(
-                Filters.eq(GeneratorDocument.ID, document.id),
-                document.toDocument(),
-                ReplaceOptions().upsert(true),
-            )
-        }.thenAccept { }
-    }
+    override fun toDocument(entity: Generator): Document =
+        GeneratorAdapter.toDocument(entity).toDocument()
 
-    override fun findById(id: String): CompletableFuture<Generator?> =
-        this.action { collection ->
-            collection.find(Filters.eq(GeneratorDocument.ID, id)).first()
-        }.thenApply { document ->
-            document?.let { GeneratorAdapter.toModel(GeneratorDocument.fromDocument(it)) }
-        }
+    override fun fromDocument(document: Document): Generator =
+        GeneratorAdapter.toModel(GeneratorDocument.fromDocument(document))
 
-    override fun findAll(): CompletableFuture<List<Generator>> =
-        this.action { collection -> collection.find().toList() }
-            .thenApply { documents ->
-                documents.map { GeneratorAdapter.toModel(GeneratorDocument.fromDocument(it)) }
-            }
+    override fun idOf(entity: Generator): String = entity.id
+
+    override fun idValue(id: String): Any = id
+
+    override fun indexes(): List<IndexModel> = listOf(
+        IndexModel(Indexes.ascending(GeneratorDocument.OWNER_ID)),
+        IndexModel(Indexes.ascending(GeneratorDocument.ENABLED)),
+        IndexModel(
+            Indexes.ascending(
+                GeneratorDocument.WORLD,
+                GeneratorDocument.X,
+                GeneratorDocument.Y,
+                GeneratorDocument.Z,
+            ),
+        ),
+    )
+
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun save(generator: Generator): CompletableFuture<Void> =
+        super.save(generator)
 
     override fun findByOwner(ownerId: UUID): CompletableFuture<List<Generator>> =
         this.action { collection ->
             collection.find(Filters.eq(GeneratorDocument.OWNER_ID, ownerId.toString())).toList()
-        }.thenApply { documents ->
-            documents.map { GeneratorAdapter.toModel(GeneratorDocument.fromDocument(it)) }
-        }
-
-    override fun removeById(id: String): CompletableFuture<Boolean> =
-        this.action { collection ->
-            collection.deleteOne(Filters.eq(GeneratorDocument.ID, id)).deletedCount > 0
-        }
-
-    override fun existsById(id: String): CompletableFuture<Boolean> =
-        this.action { collection ->
-            collection.countDocuments(Filters.eq(GeneratorDocument.ID, id)) > 0
-        }
+        }.thenApply { documents -> documents.map { GeneratorAdapter.toModel(GeneratorDocument.fromDocument(it)) } }
 }

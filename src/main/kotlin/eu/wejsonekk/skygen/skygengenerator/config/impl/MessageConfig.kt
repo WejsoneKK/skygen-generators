@@ -33,8 +33,6 @@ class MessageConfig : OkaeriConfig() {
         "<green>Przeładowano konfigurację pluginu."
     )
 
-    // --- generators ---
-
     var generatorCreated: Notice? = Notice.chat(
         "<green>Utworzono generator <white>{id}<green> (<white>{material} x{amount}<green>, co <white>{time}<green>)."
     )
@@ -72,6 +70,17 @@ class MessageConfig : OkaeriConfig() {
             "<gray>Włączony: <white>{enabled}"
     )
 
+    var generatorHelpCommand: Notice? = Notice.chat(
+        "<gradient:gold:yellow:gold#>GENERATORY KOMENDY",
+        "<gray>/generator create [id] <dark_gray>- <white>tworzy generator",
+        "<gray>/generator remove [id] <dark_gray>- <white>usuwa generator o podanym id",
+        "<gray>/generator edit [id] <dark_gray>- <white>edytuje generator o podanym id",
+        "<gray>/generator tp [id] <dark_gray>- <white>Teleportacja do miejsca generatora",
+        "<gray>/generator list <dark_gray>- <white>Otwiera menu z listą generatorów",
+        "<gray>/generator reload <dark_gray>- <white>Przeładowywuje plugin",
+        "",
+        ""
+    )
     var generatorMaterialInvalid: Notice? = Notice.chat(
         "<color:#bd0000>Nieprawidłowy materiał: <white>{material}<color:#bd0000>."
     )
@@ -80,8 +89,12 @@ class MessageConfig : OkaeriConfig() {
         "<color:#bd0000>Nieprawidłowy czas: <white>{time}<color:#bd0000>."
     )
 
-    // --- gen boosts ---
-
+    var genBoostHelpCommand: Notice? = Notice.chat(
+        "<gradient:gold:yellow:gold#>GENBOOST KOMENDY",
+        "<gray>/genboost give <[nick]> <[mnoznk]> <[czas]> <dark_gray>- <white>Daje GenBoost graczowi na serwerze.",
+        "<gray>/genboost give-all [<mnoznik>] [<czas>] <dark_gray>- <white>Daje GenBoost wszystkim graczom na serwerze.",
+        "<gray>/genboost set-item [personal|global] <dark_gray>- <white>Ustawia przedmiot reprezentujący GenBoost.",
+    )
     var genBoostItemReceived: Notice? = Notice.chat(
         "<green>Otrzymałeś <white>{type}<green> GenBoost <white>{name}<green> <gray>(<white>x{multiplier}<gray>, <white>{duration}<gray>). <yellow>Kliknij prawym, aby aktywować."
     )

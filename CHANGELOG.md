@@ -4,6 +4,15 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.5] - 2026-10-17
+
+### Fixed
+- Zaimplementowano pełny zestaw operacji repozytorium w `AbstractRepositoryMongo` (zapisywanie, wstawianie, odczyt, usuwanie, liczenie, transakcje z sesją), dzięki czemu repozytorium MongoDB znów się kompiluje i działa.
+
+### Added
+- Osobna funkcja `createIndexes()` w `AbstractRepositoryMongo` wraz z hookiem `indexes()`; indeksy są teraz tworzone przy starcie (MongoDB).
+- Dostęp do klienta w `MongoManager` (`client`) na potrzeby transakcji opartych o sesję.
+
 ## [0.3.0-alpha.4] - 2026-10-17
 
 ### Changed

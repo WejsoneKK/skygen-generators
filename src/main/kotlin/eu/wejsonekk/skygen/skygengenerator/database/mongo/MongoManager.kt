@@ -17,11 +17,15 @@ class MongoManager(
     private val logger: Logger,
 ) {
 
-    private var client: MongoClient? = null
+    private var mongoClient: MongoClient? = null
     private var database: MongoDatabase? = null
 
     val isConnected: Boolean
         get() = this.database != null
+
+    /** The active [MongoClient]; used for session based transactions. */
+    val client: MongoClient
+        get() = this.mongoClient ?: error("MongoDB is not connected")
 
     fun connect() {
         if (this.isConnected) {
@@ -43,7 +47,7 @@ class MongoManager(
 
         mongoDatabase.runCommand(Document("ping", 1))
 
-        this.client = mongoClient
+        this.mongoClient = mongoClient
         this.database = mongoDatabase
 
         this.logger.info(
@@ -60,11 +64,11 @@ class MongoManager(
 
     fun disconnect() {
         try {
-            this.client?.close()
+            this.mongoClient?.close()
         } catch (exception: Exception) {
             this.logger.warn("Failed to disconnect from MongoDB: {}", exception.message)
         } finally {
-            this.client = null
+            this.mongoClient = null
             this.database = null
         }
     }
