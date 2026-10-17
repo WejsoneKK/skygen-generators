@@ -9,6 +9,7 @@ import org.bson.Document
 data class GeneratorDocument(
     val id: String,
     val material: String,
+    val item: String?,
     val amount: Int,
     val intervalMillis: Long,
     val activationRadius: Double?,
@@ -24,6 +25,7 @@ data class GeneratorDocument(
 
     fun toDocument(): Document = Document(ID, this.id)
         .append(MATERIAL, this.material)
+        .append(ITEM, this.item)
         .append(AMOUNT, this.amount)
         .append(INTERVAL_MILLIS, this.intervalMillis)
         .append(ACTIVATION_RADIUS, this.activationRadius)
@@ -41,6 +43,7 @@ data class GeneratorDocument(
 
         const val ID = "_id"
         const val MATERIAL = "material"
+        const val ITEM = "item"
         const val AMOUNT = "amount"
         const val INTERVAL_MILLIS = "intervalMillis"
         const val ACTIVATION_RADIUS = "activationRadius"
@@ -57,6 +60,7 @@ data class GeneratorDocument(
         fun fromDocument(document: Document): GeneratorDocument = GeneratorDocument(
             id = document.getString(ID),
             material = document.getString(MATERIAL) ?: "STONE",
+            item = document.getString(ITEM),
             amount = document.getInteger(AMOUNT, 1),
             intervalMillis = document.getLong(INTERVAL_MILLIS) ?: 60_000L,
             activationRadius = document.getDouble(ACTIVATION_RADIUS),

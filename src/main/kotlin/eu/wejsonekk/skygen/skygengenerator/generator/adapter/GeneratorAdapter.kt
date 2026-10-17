@@ -5,7 +5,10 @@ import eu.wejsonekk.skygen.skygengenerator.api.generator.GeneratorLocation
 import eu.wejsonekk.skygen.skygengenerator.generator.document.GeneratorDocument
 import eu.wejsonekk.skygen.skygengenerator.generator.entity.GeneratorEntity
 import eu.wejsonekk.skygen.skygengenerator.generator.model.GeneratorImpl
+import eu.wejsonekk.skygen.skygengenerator.util.XItemStackCodec
 import com.cryptomorin.xseries.XMaterial
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -22,7 +25,7 @@ object GeneratorAdapter {
 
     fun toModel(entity: GeneratorEntity): GeneratorImpl = GeneratorImpl(
         id = entity.id,
-        material = XMaterial.matchXMaterial(entity.material).orElse(XMaterial.STONE),
+        item = resolveItem(entity.item, entity.material),
         amount = entity.amount,
         interval = Duration.ofMillis(entity.intervalMillis),
         activationRadius = entity.activationRadius,
@@ -38,6 +41,7 @@ object GeneratorAdapter {
     fun toEntity(generator: Generator): GeneratorEntity = GeneratorEntity(
         id = generator.id,
         material = generator.material.name,
+        item = XItemStackCodec.encode(generator.item),
         amount = generator.amount,
         intervalMillis = generator.interval.toMillis(),
         activationRadius = generator.activationRadius,
@@ -55,7 +59,7 @@ object GeneratorAdapter {
 
     fun toModel(document: GeneratorDocument): GeneratorImpl = GeneratorImpl(
         id = document.id,
-        material = XMaterial.matchXMaterial(document.material).orElse(XMaterial.STONE),
+        item = resolveItem(document.item, document.material),
         amount = document.amount,
         interval = Duration.ofMillis(document.intervalMillis),
         activationRadius = document.activationRadius,
@@ -71,6 +75,7 @@ object GeneratorAdapter {
     fun toDocument(generator: Generator): GeneratorDocument = GeneratorDocument(
         id = generator.id,
         material = generator.material.name,
+        item = XItemStackCodec.encode(generator.item),
         amount = generator.amount,
         intervalMillis = generator.interval.toMillis(),
         activationRadius = generator.activationRadius,
@@ -83,4 +88,13 @@ object GeneratorAdapter {
         createdAt = generator.createdAt.toEpochMilli(),
         lastGenerationAt = generator.lastGenerationAt?.toEpochMilli() ?: NO_TIMESTAMP,
     )
+
+    /**
+     * Decodes the stored item, falling back to a plain item built from the legacy
+     * `material` column for data saved before full item support.
+     */
+    private fun resolveItem(serialized: String?, material: String): ItemStack =
+        XItemStackCodec.decode(serialized)
+            ?: XMaterial.matchXMaterial(material).orElse(XMaterial.STONE).parseItem()
+            ?: ItemStack(Material.STONE)
 }

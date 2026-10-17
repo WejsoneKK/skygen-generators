@@ -16,6 +16,9 @@ class GeneratorEntity(
     @field:DatabaseField(columnName = "material")
     var material: String = "STONE",
 
+    @field:DatabaseField(columnName = "item", canBeNull = true)
+    var item: String? = null,
+
     @field:DatabaseField(columnName = "amount")
     var amount: Int = 1,
 

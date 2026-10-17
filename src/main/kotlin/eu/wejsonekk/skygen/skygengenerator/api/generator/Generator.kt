@@ -1,6 +1,7 @@
 package eu.wejsonekk.skygen.skygengenerator.api.generator
 
 import com.cryptomorin.xseries.XMaterial
+import org.bukkit.inventory.ItemStack
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -16,8 +17,8 @@ interface Generator {
     /** Unique, admin defined id (e.g. `stone_1`). */
     val id: String
 
-    /** Item dropped on every cycle. */
-    val material: XMaterial
+    /** Full item template dropped on every cycle (amount is ignored, see [amount]). */
+    val item: ItemStack
 
     /** Base amount dropped on every cycle (before boosts). */
     val amount: Int
@@ -38,4 +39,8 @@ interface Generator {
     val enabled: Boolean
     val createdAt: Instant
     val lastGenerationAt: Instant?
+
+    /** Material derived from [item], kept for display / filtering / legacy data. */
+    val material: XMaterial
+        get() = XMaterial.matchXMaterial(this.item.type)
 }

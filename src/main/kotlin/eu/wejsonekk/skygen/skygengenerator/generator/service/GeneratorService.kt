@@ -14,6 +14,8 @@ import eu.wejsonekk.skygen.skygengenerator.generator.repository.GeneratorReposit
 import com.cryptomorin.xseries.XMaterial
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -30,8 +32,6 @@ class GeneratorService(
 ) : SkyGenGeneratorsApi {
 
     private val cache = ConcurrentHashMap<String, Generator>()
-
-    // --- lifecycle (used by the plugin / manager) ---
 
     fun load(): CompletableFuture<Void> =
         this.repository.findAll().thenAccept { generators ->
@@ -53,7 +53,7 @@ class GeneratorService(
         if (this is GeneratorImpl) this.withLastGenerationAt(instant)
         else GeneratorImpl(
             id = this.id,
-            material = this.material,
+            item = this.item,
             amount = this.amount,
             interval = this.interval,
             activationRadius = this.activationRadius,
@@ -68,7 +68,7 @@ class GeneratorService(
         if (this is GeneratorImpl) this.withEnabled(enabled)
         else GeneratorImpl(
             id = this.id,
-            material = this.material,
+            item = this.item,
             amount = this.amount,
             interval = this.interval,
             activationRadius = this.activationRadius,
@@ -117,8 +117,6 @@ class GeneratorService(
         return this.update(current.withEnabled(enabled))
     }
 
-    // --- public API ---
-
     override fun generator(id: String): CompletableFuture<Generator?> {
         this.cache[id]?.let { return CompletableFuture.completedFuture(it) }
         return this.repository.findById(id).thenApply { found -> found?.also { this.cache[it.id] = it } }
@@ -154,9 +152,12 @@ class GeneratorService(
             )
         }
 
+        val template = material.parseItem() ?: ItemStack(Material.STONE)
+        template.amount = 1
+
         val generator = GeneratorImpl(
             id = id,
-            material = material,
+            item = template,
             amount = amount.coerceAtLeast(1),
             interval = if (interval.isNegative || interval.isZero) Duration.ofSeconds(1) else interval,
             activationRadius = activationRadius,

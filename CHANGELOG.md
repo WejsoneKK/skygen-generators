@@ -4,6 +4,16 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.6] - 2026-10-17
+
+### Changed
+- Generator przechowuje teraz **cały item** (nazwa, opis, enchanty, NBT...) zamiast samego typu materiału; drop generuje dokładnie ten item.
+- Przycisk w edytorze `Zmień materiał` zastąpiono przez `Zmień item`, który ustawia pełny item trzymany w dłoni; dodano placeholder `{item}` (nazwa itemu).
+- Model, encja SQL, dokument MongoDB i adaptery przechowują zserializowany item (`XItemStack`), z fallbackiem do starego pola `material` dla danych sprzed zmiany.
+
+### Fixed
+- Edytor nie gubi już metadanych itemu (wcześniej zapisywany był wyłącznie typ materiału).
+
 ## [0.3.0-alpha.5] - 2026-10-17
 
 ### Fixed

@@ -2,7 +2,7 @@ package eu.wejsonekk.skygen.skygengenerator.generator.model
 
 import eu.wejsonekk.skygen.skygengenerator.api.generator.Generator
 import eu.wejsonekk.skygen.skygengenerator.api.generator.GeneratorLocation
-import com.cryptomorin.xseries.XMaterial
+import org.bukkit.inventory.ItemStack
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
@@ -13,7 +13,7 @@ import java.util.UUID
  */
 data class GeneratorImpl(
     override val id: String,
-    override val material: XMaterial,
+    override val item: ItemStack,
     override val amount: Int,
     override val interval: Duration,
     override val activationRadius: Double?,
@@ -24,7 +24,7 @@ data class GeneratorImpl(
     override val lastGenerationAt: Instant?,
 ) : Generator {
 
-    fun withMaterial(material: XMaterial): GeneratorImpl = this.copy(material = material)
+    fun withItem(item: ItemStack): GeneratorImpl = this.copy(item = item.clone())
 
     fun withAmount(amount: Int): GeneratorImpl = this.copy(amount = amount.coerceAtLeast(1))
 

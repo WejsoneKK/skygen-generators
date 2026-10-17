@@ -1,6 +1,5 @@
 package eu.wejsonekk.skygen.skygengenerator.generator.gui
 
-import com.cryptomorin.xseries.XMaterial
 import eu.wejsonekk.skygen.skygengenerator.api.generator.Generator
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GeneratorConfig
 import eu.wejsonekk.skygen.skygengenerator.generator.model.GeneratorImpl
@@ -10,7 +9,9 @@ import eu.wejsonekk.skygen.skygengenerator.gui.GuiItems
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiLayout
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
 import eu.wejsonekk.skygen.skygengenerator.util.Text
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.time.Duration
 
 /**
@@ -47,8 +48,8 @@ class GeneratorEditGui(
         this.setItem(this.slot("intervalDecrease", 15), this.guiItem("intervalDecrease", ph)) { player ->
             this.apply(this.copy(interval = this.shorten()), player)
         }
-        this.setItem(this.slot("changeMaterial", 16), this.guiItem("changeMaterial", ph)) { player ->
-            this.apply(this.copy(material = XMaterial.matchXMaterial(player.inventory.itemInMainHand.type)), player)
+        this.setItem(this.slot("changeItem", 16), this.guiItem("changeItem", ph)) { player ->
+            this.changeItem(player)
         }
         this.setItem(this.slot("radiusIncrease", 20), this.guiItem("radiusIncrease", ph)) { player ->
             this.apply(this.copy(activationRadius = this.currentRadius() + 1.0), player)
@@ -64,6 +65,7 @@ class GeneratorEditGui(
 
     private fun placeholders(): Map<String, String> = mapOf(
         "id" to this.generator.id,
+        "item" to this.itemName(),
         "material" to this.generator.material.name,
         "amount" to this.generator.amount.toString(),
         "interval" to DurationFormat.format(this.generator.interval),
@@ -72,7 +74,23 @@ class GeneratorEditGui(
         "enabled" to if (this.generator.enabled) "<green>włączony" else "<red>wyłączony",
     )
 
+    private fun itemName(): String {
+        val displayName = this.generator.item.itemMeta?.displayName()
+            ?: return this.generator.material.name
+        return PlainTextComponentSerializer.plainText().serialize(displayName)
+    }
+
     private fun currentRadius(): Double = this.generator.activationRadius ?: this.generatorConfig.activationRadius
+
+    private fun changeItem(player: Player) {
+        val held = player.inventory.itemInMainHand
+        if (held.type.isAir) {
+            return
+        }
+
+        val template = held.clone().apply { amount = 1 }
+        this.apply(this.copy(item = template), player)
+    }
 
     private fun apply(updated: Generator, player: Player) {
         this.service.update(updated)
@@ -86,14 +104,14 @@ class GeneratorEditGui(
     }
 
     private fun copy(
-        material: XMaterial = this.generator.material,
+        item: ItemStack = this.generator.item,
         amount: Int = this.generator.amount,
         interval: Duration = this.generator.interval,
         activationRadius: Double? = this.generator.activationRadius,
         enabled: Boolean = this.generator.enabled,
     ): Generator = GeneratorImpl(
         id = this.generator.id,
-        material = material,
+        item = item.clone(),
         amount = amount.coerceAtLeast(1),
         interval = interval,
         activationRadius = activationRadius,
