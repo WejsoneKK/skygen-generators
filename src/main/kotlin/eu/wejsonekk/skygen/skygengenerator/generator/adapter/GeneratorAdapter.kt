@@ -5,6 +5,7 @@ import eu.wejsonekk.skygen.skygengenerator.api.generator.GeneratorLocation
 import eu.wejsonekk.skygen.skygengenerator.generator.document.GeneratorDocument
 import eu.wejsonekk.skygen.skygengenerator.generator.entity.GeneratorEntity
 import eu.wejsonekk.skygen.skygengenerator.generator.model.GeneratorImpl
+import eu.wejsonekk.skygen.skygengenerator.util.ItemStackBytesCodec
 import eu.wejsonekk.skygen.skygengenerator.util.XItemStackCodec
 import com.cryptomorin.xseries.XMaterial
 import org.bukkit.Material
@@ -41,7 +42,7 @@ object GeneratorAdapter {
     fun toEntity(generator: Generator): GeneratorEntity = GeneratorEntity(
         id = generator.id,
         material = generator.material.name,
-        item = XItemStackCodec.encode(generator.item),
+        item = ItemStackBytesCodec.encode(generator.item),
         amount = generator.amount,
         intervalMillis = generator.interval.toMillis(),
         activationRadius = generator.activationRadius,
@@ -75,7 +76,7 @@ object GeneratorAdapter {
     fun toDocument(generator: Generator): GeneratorDocument = GeneratorDocument(
         id = generator.id,
         material = generator.material.name,
-        item = XItemStackCodec.encode(generator.item),
+        item = ItemStackBytesCodec.encode(generator.item),
         amount = generator.amount,
         intervalMillis = generator.interval.toMillis(),
         activationRadius = generator.activationRadius,
@@ -90,11 +91,13 @@ object GeneratorAdapter {
     )
 
     /**
-     * Decodes the stored item, falling back to a plain item built from the legacy
-     * `material` column for data saved before full item support.
+     * Decodes the stored item. New rows are Base64 encoded Bukkit item bytes,
+     * older rows used an XItemStack YAML string and the oldest ones only stored
+     * the `material` column - both fallbacks are supported here.
      */
     private fun resolveItem(serialized: String?, material: String): ItemStack =
-        XItemStackCodec.decode(serialized)
+        ItemStackBytesCodec.decode(serialized)
+            ?: XItemStackCodec.decode(serialized)
             ?: XMaterial.matchXMaterial(material).orElse(XMaterial.STONE).parseItem()
             ?: ItemStack(Material.STONE)
 }

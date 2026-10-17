@@ -61,6 +61,14 @@ class MessageConfig : OkaeriConfig() {
         "<green>Przeteleportowano do generatora <white>{id}<green>."
     )
 
+    var generatorItemChanged: Notice? = Notice.chat(
+        "<green>Zmieniono item generatora <white>{id}<green> na <white>{item}<green>."
+    )
+
+    var generatorItemNoItem: Notice? = Notice.chat(
+        "<color:#bd0000>Musisz trzymać item w dłoni, aby ustawić item generatora."
+    )
+
     var generatorInfo: Notice? = Notice.chat(
         "<gold>Generator <white>{id}<gold>\n" +
             "<gray>Item: <white>{material} <gray>x<white>{amount}\n" +

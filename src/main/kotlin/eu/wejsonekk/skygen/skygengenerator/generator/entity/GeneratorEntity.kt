@@ -1,5 +1,6 @@
 package eu.wejsonekk.skygen.skygengenerator.generator.entity
 
+import com.j256.ormlite.field.DataType
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
 import java.util.UUID
@@ -16,7 +17,7 @@ class GeneratorEntity(
     @field:DatabaseField(columnName = "material")
     var material: String = "STONE",
 
-    @field:DatabaseField(columnName = "item", canBeNull = true)
+    @field:DatabaseField(columnName = "item", canBeNull = true, dataType = DataType.LONG_STRING)
     var item: String? = null,
 
     @field:DatabaseField(columnName = "amount")

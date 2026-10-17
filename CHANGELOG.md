@@ -4,6 +4,17 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.8] - 2026-10-17
+
+### Added
+- Przycisk `Zmień item` w edytorze generatora pokazuje teraz aktualny item jako swoją ikonę.
+- Komunikaty `generatorItemChanged` oraz `generatorItemNoItem` (zmiana itemu / brak itemu w dłoni).
+
+### Changed
+- Zmiana itemu (i pozostałe akcje edytora) odświeżają GUI w miejscu zamiast otwierać je ponownie.
+- Generatory są zapisywane w bazie danych jako **Base64 z `ItemStack.serializeAsBytes()`** (SQL i MongoDB), z fallbackiem do starego stringa `XItemStack` i kolumny `material`; kolumna `item` w SQL jest teraz typu `TEXT`.
+- `DurationFormat` pokazuje milisekundy (np. `12s 500ms`), a przy `removeMillis = true` pomija je i pokazuje `<1s` zamiast `0s`.
+
 ## [0.3.0-alpha.7] - 2026-10-17
 
 ### Added

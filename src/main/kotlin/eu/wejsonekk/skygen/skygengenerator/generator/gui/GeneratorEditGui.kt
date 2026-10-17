@@ -7,6 +7,7 @@ import eu.wejsonekk.skygen.skygengenerator.generator.service.GeneratorService
 import eu.wejsonekk.skygen.skygengenerator.gui.AbstractGui
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiItems
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiLayout
+import eu.wejsonekk.skygen.skygengenerator.notice.NoticeService
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
 import eu.wejsonekk.skygen.skygengenerator.util.Text
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -22,6 +23,7 @@ class GeneratorEditGui(
     private val service: GeneratorService,
     private var generator: Generator,
     private val generatorConfig: GeneratorConfig,
+    private val noticeService: NoticeService,
 ) : AbstractGui(
     GuiItems.editor(),
     Text.parse(GuiItems.editor().title.replace("{id}", generator.id)),
@@ -48,9 +50,15 @@ class GeneratorEditGui(
         this.setItem(this.slot("intervalDecrease", 15), this.guiItem("intervalDecrease", ph)) { player ->
             this.apply(this.copy(interval = this.shorten()), player)
         }
-        this.setItem(this.slot("changeItem", 16), this.guiItem("changeItem", ph)) { player ->
-            this.changeItem(player)
-        }
+        this.setItem(
+            this.slot("changeItem", 16),
+            GuiItems.build(
+                this.section.items["changeItem"],
+                this.viewer,
+                ph,
+                this.generator.item.clone().apply { amount = 1 },
+            ),
+        ) { player -> this.changeItem(player) }
         this.setItem(this.slot("radiusIncrease", 20), this.guiItem("radiusIncrease", ph)) { player ->
             this.apply(this.copy(activationRadius = this.currentRadius() + 1.0), player)
         }
@@ -74,8 +82,8 @@ class GeneratorEditGui(
         "enabled" to if (this.generator.enabled) "<green>włączony" else "<red>wyłączony",
     )
 
-    private fun itemName(): String {
-        val displayName = this.generator.item.itemMeta?.displayName()
+    private fun itemName(item: ItemStack = this.generator.item): String {
+        val displayName = item.itemMeta?.displayName()
             ?: return this.generator.material.name
         return PlainTextComponentSerializer.plainText().serialize(displayName)
     }
@@ -85,17 +93,31 @@ class GeneratorEditGui(
     private fun changeItem(player: Player) {
         val held = player.inventory.itemInMainHand
         if (held.type.isAir) {
+            this.noticeService.create()
+                .viewer(player)
+                .notice { it.generatorItemNoItem }
+                .send()
             return
         }
 
         val template = held.clone().apply { amount = 1 }
-        this.apply(this.copy(item = template), player)
+        val updated = this.copy(item = template)
+        this.service.update(updated)
+        this.generator = updated
+        this.refresh(player)
+
+        this.noticeService.create()
+            .viewer(player)
+            .notice { it.generatorItemChanged }
+            .placeholder("{id}", updated.id)
+            .placeholder("{item}", itemName(updated.item))
+            .send()
     }
 
     private fun apply(updated: Generator, player: Player) {
         this.service.update(updated)
         this.generator = updated
-        this.open(player)
+        this.refresh(player)
     }
 
     private fun delete(player: Player) {

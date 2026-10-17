@@ -110,7 +110,7 @@ class GeneratorCommand(
                     .send()
                 return@runMain
             }
-            GeneratorEditGui(this.service, generator, this.generatorConfig).open(player)
+            GeneratorEditGui(this.service, generator, this.generatorConfig, this.noticeService).open(player)
         } }
     }
 
@@ -150,7 +150,7 @@ class GeneratorCommand(
                 this.noticeService.create().viewer(player).notice { it.generatorListEmpty }.send()
                 return@runMain
             }
-            GeneratorListGui(this.service, generators.toList(), this.generatorConfig).open(player)
+            GeneratorListGui(this.service, generators.toList(), this.generatorConfig, this.noticeService).open(player)
         } }
     }
 

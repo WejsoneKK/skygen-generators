@@ -8,6 +8,7 @@ import eu.wejsonekk.skygen.skygengenerator.gui.GuiEntry
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiItems
 import eu.wejsonekk.skygen.skygengenerator.gui.GuiLayout
 import eu.wejsonekk.skygen.skygengenerator.gui.PaginatedGui
+import eu.wejsonekk.skygen.skygengenerator.notice.NoticeService
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
 import eu.wejsonekk.skygen.skygengenerator.util.Text
 import org.bukkit.inventory.ItemStack
@@ -20,6 +21,7 @@ class GeneratorListGui(
     private val service: GeneratorService,
     private val generators: List<Generator>,
     private val generatorConfig: GeneratorConfig,
+    private val noticeService: NoticeService,
 ) : PaginatedGui(GuiItems.list(), Text.parse(GuiItems.list().title)) {
 
     private var sortMode: SortMode = SortMode.ID
@@ -41,7 +43,7 @@ class GeneratorListGui(
 
         return sorted.map { generator ->
             GuiEntry(this.item(generator)) { player ->
-                GeneratorEditGui(this.service, generator, this.generatorConfig).open(player)
+                GeneratorEditGui(this.service, generator, this.generatorConfig, this.noticeService).open(player)
             }
         }
     }

@@ -23,9 +23,14 @@ object GuiItems {
 
     fun editor(): GuiSectionConfig = this.config.editor
 
-    fun build(item: GuiItemConfig?, viewer: Player?, placeholders: Map<String, String> = emptyMap()): ItemStack {
+    fun build(
+        item: GuiItemConfig?,
+        viewer: Player?,
+        placeholders: Map<String, String> = emptyMap(),
+        override: ItemStack? = null,
+    ): ItemStack {
         val definition = item ?: GuiItemConfig()
-        val base = definition.item?.clone()
+        val base = override?.clone() ?: definition.item?.clone()
 
         val builder = if (base != null) {
             ItemBuilder.of(base, viewer)
