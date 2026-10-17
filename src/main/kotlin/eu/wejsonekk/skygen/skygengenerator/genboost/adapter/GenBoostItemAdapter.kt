@@ -5,7 +5,6 @@ import eu.wejsonekk.skygen.skygengenerator.api.genboost.GenBoostType
 import eu.wejsonekk.skygen.skygengenerator.config.impl.GenBoostConfig
 import eu.wejsonekk.skygen.skygengenerator.util.DurationFormat
 import eu.wejsonekk.skygen.skygengenerator.util.Text
-import eu.wejsonekk.skygen.skygengenerator.util.XItemStackCodec
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -40,8 +39,8 @@ class GenBoostItemAdapter(
     )
 
     fun template(type: GenBoostType): ItemStack {
-        val raw = if (type == GenBoostType.GLOBAL) this.config.items.global else this.config.items.personal
-        return XItemStackCodec.decode(raw) ?: this.defaultTemplate(type)
+        val configured = if (type == GenBoostType.GLOBAL) this.config.items.global else this.config.items.personal
+        return configured?.clone() ?: this.defaultTemplate(type)
     }
 
     fun applyTemplate(type: GenBoostType, item: ItemStack) {
@@ -56,11 +55,10 @@ class GenBoostItemAdapter(
             template.itemMeta = meta
         }
 
-        val encoded = XItemStackCodec.encode(template)
         if (type == GenBoostType.GLOBAL) {
-            this.config.items.global = encoded
+            this.config.items.global = template
         } else {
-            this.config.items.personal = encoded
+            this.config.items.personal = template
         }
     }
 

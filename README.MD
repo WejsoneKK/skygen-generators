@@ -63,6 +63,27 @@ Base command: `/genboost` (aliases: `/gb`, `/genboosts`)
 | `wskygenerator.command.genboost.giveall`  | Allows giving global boosts                 |
 | `wskygenerator.command.genboost.setitem` | Allows changing the boost item template     |
 
+## Configuration
+Items stored in config files (`genboost.yml`, `gui.yml`) are serialized with
+[XSeries](https://github.com/CryptoMorin/XSeries) `XItemStack`, so they are
+cross-version safe. Each item is written as a readable map, e.g.:
+
+```yaml
+items:
+  global:
+    material: PLAYER_HEAD
+    name: "<gradient:#00c6ff:#0072ff><bold>GLOBAL GENBOOST</bold></gradient>"
+    lore:
+      - "<gray>Right-click to activate"
+    enchants:
+      unbreaking: 1
+    skull: Notch
+    custom-model-data: 1001
+```
+
+Names and lore use MiniMessage; placeholders `%...%` (PlaceholderAPI) are
+resolved where relevant.
+
 ## Building
 The project uses the Gradle Shadow plugin and targets Java 23.
 

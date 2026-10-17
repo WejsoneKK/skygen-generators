@@ -2,6 +2,7 @@ package eu.wejsonekk.skygen.skygengenerator.config.impl
 
 import eu.okaeri.configs.OkaeriConfig
 import eu.okaeri.configs.annotation.Comment
+import org.bukkit.inventory.ItemStack
 
 /**
  * Item templates used as the physical representation of gen boosts.
@@ -10,11 +11,11 @@ import eu.okaeri.configs.annotation.Comment
  */
 class BoostItemsConfig : OkaeriConfig() {
 
-    @Comment("Zserializowany (XItemStack) item reprezentujacy fizyczny personalny GenBoost")
-    var personal: String = ""
+    @Comment("Item reprezentujacy fizyczny personalny GenBoost (null = domyslny)")
+    var personal: ItemStack? = null
 
-    @Comment("Zserializowany (XItemStack) item reprezentujacy fizyczny globalny GenBoost")
-    var global: String = ""
+    @Comment("Item reprezentujacy fizyczny globalny GenBoost (null = domyslny)")
+    var global: ItemStack? = null
 
     @Comment("Czy fizyczne GenBoosty mozna aktywowac takze klikajac w powietrzu")
     var allowAirActivation: Boolean = true

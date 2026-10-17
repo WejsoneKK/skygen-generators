@@ -4,6 +4,16 @@ Wszystkie istotne zmiany w projekcie. Format oparty o
 [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/),
 wersjonowanie zgodne z [Semantic Versioning](https://semver.org/lang/pl/).
 
+## [0.3.0-alpha.7] - 2026-10-17
+
+### Added
+- Własny serdes Okaeri (`ItemStackSerdesPack`) dla `ItemStack` oparty o XSeries `XItemStack` - itemy w konfiguracji zapisują się teraz jako czytelna mapa (`material`, `name`, `lore`, `enchants`, `skull`, `custom-model-data`...), niezależnie od wersji serwera. Zarejestrowany po `SerdesBukkit`, więc ma priorytet nad wbudowanym serializatorem Bukkit.
+- `GuiItemConfig` przyjmuje opcjonalny pełny `item` (dowolna główka/enchanty) obok dotychczasowego `material`.
+
+### Changed
+- Szablony fizycznych GenBoostów (`genboost.yml`) to teraz pola typu `ItemStack` zamiast zserializowanego stringu; `/genboost set-item` zapisuje pełny item.
+- Stare wartości `personal`/`global` (string `XItemStack`) są nadal odczytywane i migrowane automatycznie.
+
 ## [0.3.0-alpha.6] - 2026-10-17
 
 ### Changed

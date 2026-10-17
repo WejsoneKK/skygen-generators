@@ -9,6 +9,7 @@ import eu.okaeri.configs.serdes.adventure.SerdesAdventure
 import eu.okaeri.configs.serdes.commons.SerdesCommons
 import eu.okaeri.configs.yaml.bukkit.serdes.SerdesBukkit
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer
+import eu.wejsonekk.skygen.skygengenerator.config.serdes.ItemStackSerdesPack
 import java.io.File
 
 /**
@@ -35,6 +36,7 @@ class ConfigService {
                     YamlSnakeYamlConfigurer(),
                     SerdesCommons(),
                     SerdesBukkit(),
+                    ItemStackSerdesPack(),
                     SerdesAdventure(),
                     MultificationSerdesPack(noticeRegistry),
                 )

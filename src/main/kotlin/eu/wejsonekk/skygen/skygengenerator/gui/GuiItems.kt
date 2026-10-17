@@ -25,9 +25,14 @@ object GuiItems {
 
     fun build(item: GuiItemConfig?, viewer: Player?, placeholders: Map<String, String> = emptyMap()): ItemStack {
         val definition = item ?: GuiItemConfig()
-        val material = XMaterial.matchXMaterial(definition.material).orElse(XMaterial.STONE)
+        val base = definition.item?.clone()
 
-        val builder = ItemBuilder.of(material, definition.amount, viewer)
+        val builder = if (base != null) {
+            ItemBuilder.of(base, viewer)
+        } else {
+            val material = XMaterial.matchXMaterial(definition.material).orElse(XMaterial.STONE)
+            ItemBuilder.of(material, definition.amount, viewer)
+        }
             .texture(definition.texture)
             .glow(definition.glow)
             .customModelData(definition.customModelData)
